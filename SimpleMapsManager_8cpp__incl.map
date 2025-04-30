@@ -1,0 +1,44 @@
+<map id="easynav_simple_maps_manager/src/easynav_simple_maps_manager/SimpleMapsManager.cpp" name="easynav_simple_maps_manager/src/easynav_simple_maps_manager/SimpleMapsManager.cpp">
+<area shape="rect" id="Node000001" title="Implementation of the SimpleMapsManager class." alt="" coords="607,5,778,76"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="245,132,319,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="607,60,476,88,331,127,325,128,324,123,329,121,475,83,606,55"/>
+<area shape="rect" id="Node000003" href="$SimpleMapsManager_8hpp.html" title="Declaration of the SimpleMapsManager method." alt="" coords="342,124,571,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="613,79,518,120,516,115,611,74"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="594,124,791,165"/>
+<area shape="poly" id="edge23_Node000001_Node000015" title=" " alt="" coords="695,76,695,108,690,108,690,76"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="815,124,960,165"/>
+<area shape="poly" id="edge24_Node000001_Node000016" title=" " alt="" coords="760,74,837,114,835,119,758,79"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="984,124,1111,165"/>
+<area shape="poly" id="edge25_Node000001_Node000017" title=" " alt="" coords="780,64,970,118,968,123,778,69"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,309,63,334"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="356,168,281,188,206,215,127,258,63,301,60,297,124,253,204,210,279,183,354,163"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="87,309,165,334"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="391,168,333,188,275,215,208,258,153,301,150,296,204,254,273,210,331,184,389,163"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="189,309,263,334"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="408,168,366,188,325,215,280,256,246,298,242,294,276,253,322,211,364,184,406,163"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="287,309,338,334"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="412,168,379,188,351,214,339,233,330,254,319,294,314,293,325,252,334,231,347,211,376,183,409,163"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="363,309,428,334"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="412,167,384,187,362,214,357,234,360,256,368,276,379,295,374,298,363,279,354,257,351,234,357,211,380,183,409,163"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="452,309,520,334"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="504,163,533,183,556,211,562,233,556,254,540,281,518,301,515,298,536,277,552,252,557,233,552,214,530,187,501,167"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="544,301,721,342"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="506,163,543,183,577,211,604,248,623,286,618,288,600,250,573,215,540,188,503,167"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="746,309,944,334"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="502,163,610,210,806,300,804,305,608,215,500,168"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="768,213,956,253"/>
+<area shape="poly" id="edge11_Node000003_Node000012" title=" " alt="" coords="550,163,755,206,754,212,549,168"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="968,301,1129,342"/>
+<area shape="poly" id="edge12_Node000003_Node000013" title=" " alt="" coords="528,163,671,210,714,231,758,251,842,273,953,298,952,303,841,279,756,256,712,236,669,215,526,168"/>
+<area shape="rect" id="Node000014" href="$SimpleMap_8hpp.html" title="Declaration of the SimpleMap type." alt="" coords="371,213,542,253"/>
+<area shape="poly" id="edge13_Node000003_Node000014" title=" " alt="" coords="459,165,459,197,454,197,454,165"/>
+<area shape="poly" id="edge14_Node000014_Node000004" title=" " alt="" coords="371,246,231,267,153,283,76,304,72,305,71,300,75,299,151,278,230,262,370,240"/>
+<area shape="poly" id="edge15_Node000014_Node000005" title=" " alt="" coords="371,255,278,276,177,304,171,306,170,301,176,299,276,271,370,249"/>
+<area shape="poly" id="edge16_Node000014_Node000006" title=" " alt="" coords="404,256,276,304,272,305,271,300,274,299,402,251"/>
+<area shape="poly" id="edge17_Node000014_Node000007" title=" " alt="" coords="425,256,347,303,344,298,423,252"/>
+<area shape="poly" id="edge18_Node000014_Node000008" title=" " alt="" coords="445,255,415,298,410,295,441,252"/>
+<area shape="poly" id="edge19_Node000014_Node000009" title=" " alt="" coords="466,253,480,293,475,295,461,255"/>
+<area shape="poly" id="edge20_Node000014_Node000010" title=" " alt="" coords="498,251,580,292,578,297,495,256"/>
+<area shape="poly" id="edge21_Node000014_Node000011" title=" " alt="" coords="543,251,776,302,775,308,542,256"/>
+<area shape="poly" id="edge22_Node000014_Node000013" title=" " alt="" coords="543,241,727,265,953,298,953,304,727,270,543,247"/>
+</map>
