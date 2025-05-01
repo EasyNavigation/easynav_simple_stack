@@ -51,12 +51,13 @@ SimpleMapsManager::on_initialize()
     std::string pkgpath;
     try {
       pkgpath = ament_index_cpp::get_package_share_directory(package_name);
+      map_path_ = pkgpath + "/" + map_path_file;
     } catch(ament_index_cpp::PackageNotFoundError & ex) {
       return std::unexpected("Package " + package_name + " not found. Error: " + ex.what());
     }
 
-    if (!static_map_->load_from_file(pkgpath + "/" + map_path_file)) {
-      return std::unexpected("File [" + pkgpath + "/" + map_path_file + "] not found");
+    if (!static_map_->load_from_file(map_path_)) {
+      return std::unexpected("File [" + map_path_ + "] not found");
     }
   }
 
@@ -73,6 +74,22 @@ SimpleMapsManager::on_initialize()
     [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
       static_map_->from_occupancy_grid(*msg);
       dynamic_map_->from_occupancy_grid(*msg);
+    });
+
+  savemap_srv_ = node->create_service<std_srvs::srv::Trigger>(
+    node->get_name() + std::string("/") + plugin_name + "/savemap",
+    [this](
+      const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+      std::shared_ptr<std_srvs::srv::Trigger::Response> response)
+    {
+      (void)request;
+      if (!static_map_->save_to_file(map_path_)) {
+        response->success = false;
+        response->message = "Failed to save map to: " + map_path_;
+      } else {
+        response->success = true;
+        response->message = "Map successfully saved to: " + map_path_;
+      }
     });
 
   static_map_->to_occupancy_grid(static_grid_msg_);

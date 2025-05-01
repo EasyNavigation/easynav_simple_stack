@@ -25,7 +25,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 
+#include "std_srvs/srv/trigger.hpp"
+
 #include <memory>
+#include <fstream>
 
 /// \brief Fixture for SimpleMapsManager tests (minimal)
 class SimpleMapsManagerTest : public ::testing::Test
@@ -129,4 +132,56 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
 
   EXPECT_EQ(static_map->at(5, 5), 1);
   EXPECT_EQ(static_map->at(1, 1), 0);
+}
+
+TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
+{
+  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_savemap_node");
+  auto manager = std::make_shared<easynav::SimpleMapsManager>();
+  manager->initialize(node, "test_savemap");
+
+  auto static_map = std::make_shared<easynav::SimpleMap>();
+  static_map->initialize(4, 4, 0.5, -1.0, -1.0, 0);
+  static_map->at(1, 1) = true;
+  static_map->at(2, 2) = true;
+  manager->set_static_map(static_map);
+
+  const std::string test_map_file = "/tmp/savemap_test_map.txt";
+  const std::string service_name = "/test_savemap_node/test_savemap/savemap";
+
+  {
+    class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
+    public:
+      void force_path(const std::string & path) { map_path_ = path; }
+    };
+    std::static_pointer_cast<FriendSimpleMapsManager>(manager)->force_path(test_map_file);
+  }
+
+  // Setup executor and spin
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node->get_node_base_interface());
+
+  // Wait for service
+  auto client = node->create_client<std_srvs::srv::Trigger>(service_name);
+  ASSERT_TRUE(client->wait_for_service(std::chrono::seconds(1)));
+
+  auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
+  auto future = client->async_send_request(request);
+  executor.spin_until_future_complete(future);
+
+  auto response = future.get();
+  EXPECT_TRUE(response->success);
+  EXPECT_NE(response->message.find("saved"), std::string::npos);
+
+  // Check file contents were written
+  std::ifstream infile(test_map_file);
+  ASSERT_TRUE(infile.is_open());
+
+  std::string first_line;
+  std::getline(infile, first_line);
+  EXPECT_NE(first_line.find("4 4"), std::string::npos);
+  EXPECT_NE(first_line.find("0.5"), std::string::npos);
+
+  infile.close();
+  std::remove(test_map_file.c_str());
 }

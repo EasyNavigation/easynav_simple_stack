@@ -17,6 +17,7 @@ find_package(easynav_core REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(easynav_simple_common REQUIRED)
+find_package(std_srvs REQUIRED)
 
 set(dependencies
   rclcpp
@@ -28,6 +29,7 @@ set(dependencies
   geometry_msgs
   ament_index_cpp
   easynav_simple_common
+  std_srvs
 )
 
 include_directories(include)

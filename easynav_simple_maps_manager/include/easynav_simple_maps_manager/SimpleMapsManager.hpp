@@ -32,6 +32,7 @@
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "std_srvs/srv/trigger.hpp"
 
 #include "easynav_core/MapsManagerBase.hpp"
 #include "easynav_common/types/MapTypeBase.hpp"
@@ -108,7 +109,15 @@ public:
    */
   void set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map);
 
+protected:
+
+  /**
+   * @brief Full path to the map file.
+   */
+  std::string map_path_;
+
 private:
+
   /**
    * @brief Internal static map.
    */
@@ -133,6 +142,11 @@ private:
    * @brief Subscriber for external incoming static map updates.
    */
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr incoming_map_sub_;
+
+  /**
+   * @brief Service for saving current map to disk.
+   */
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr savemap_srv_;
 
   /**
    * @brief Cached occupancy grid message for the static map.
