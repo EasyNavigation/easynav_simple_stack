@@ -89,3 +89,52 @@ TEST_F(SimpleMapTest, SaveLoadMap)
   EXPECT_TRUE(loaded_map.at(2, 2));
   EXPECT_FALSE(loaded_map.at(0, 0));
 }
+
+/// \brief Conversion to and from OccupancyGrid test
+TEST_F(SimpleMapTest, OccupancyGridConversion)
+{
+  easynav::SimpleMap original_map;
+  original_map.initialize(4, 3, 0.2, -1.0, -0.6);
+  original_map.at(0, 0) = true;
+  original_map.at(1, 1) = true;
+  original_map.at(3, 2) = true;
+
+  nav_msgs::msg::OccupancyGrid grid_msg;
+  original_map.to_occupancy_grid(grid_msg);
+
+  EXPECT_EQ(grid_msg.info.width, 4u);
+  EXPECT_EQ(grid_msg.info.height, 3u);
+  EXPECT_NEAR(grid_msg.info.resolution, 0.2, 1e-6);
+  EXPECT_NEAR(grid_msg.info.origin.position.x, -1.0, 1e-6);
+  EXPECT_NEAR(grid_msg.info.origin.position.y, -0.6, 1e-6);
+
+  std::vector<int> expected_indices = {
+    0 * 4 + 0,  // (0,0)
+    1 * 4 + 1,  // (1,1)
+    2 * 4 + 3   // (3,2)
+  };
+
+  for (std::size_t i = 0; i < grid_msg.data.size(); ++i) {
+    bool is_occupied = std::find(expected_indices.begin(),
+      expected_indices.end(), i) != expected_indices.end();
+    EXPECT_EQ(grid_msg.data[i], is_occupied ? 100 : 0);
+  }
+
+  easynav::SimpleMap recovered_map;
+  recovered_map.from_occupancy_grid(grid_msg);
+
+  EXPECT_EQ(recovered_map.width(), 4u);
+  EXPECT_EQ(recovered_map.height(), 3u);
+  EXPECT_NEAR(recovered_map.resolution(), 0.2, 1e-6);
+  EXPECT_NEAR(recovered_map.origin_x(), -1.0, 1e-6);
+  EXPECT_NEAR(recovered_map.origin_y(), -0.6, 1e-6);
+
+  for (std::size_t y = 0; y < 3; ++y) {
+    for (std::size_t x = 0; x < 4; ++x) {
+      EXPECT_EQ(
+        recovered_map.at(x, y),
+        original_map.at(x, y)
+      ) << "Mismatch at (" << x << "," << y << ")";
+    }
+  }
+}
