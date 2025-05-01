@@ -157,11 +157,9 @@ TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
     std::static_pointer_cast<FriendSimpleMapsManager>(manager)->force_path(test_map_file);
   }
 
-  // Setup executor and spin
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node->get_node_base_interface());
 
-  // Wait for service
   auto client = node->create_client<std_srvs::srv::Trigger>(service_name);
   ASSERT_TRUE(client->wait_for_service(std::chrono::seconds(1)));
 
@@ -173,7 +171,6 @@ TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
   EXPECT_TRUE(response->success);
   EXPECT_NE(response->message.find("saved"), std::string::npos);
 
-  // Check file contents were written
   std::ifstream infile(test_map_file);
   ASSERT_TRUE(infile.is_open());
 
