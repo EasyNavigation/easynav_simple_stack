@@ -29,7 +29,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 
 #include "easynav_common/types/MapTypeBase.hpp"
-#include "easynav_simple_maps_manager/SimpleMap.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 namespace easynav
 {

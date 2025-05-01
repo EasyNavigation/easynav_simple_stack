@@ -121,12 +121,13 @@ SimpleMapsManager::update(const NavState & nav_state)
       if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
         auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
         dynamic_map_->at(cx, cy) = 1;
-      } else {
-        auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-        RCLCPP_WARN(get_node()->get_logger(),
-          "SimpleMapsManager::update: Trying to update wrong coordinate (%lf, %lf) (%lu, %lu)",
-          p.x, p.y, cx, cy);
       }
+//       else {
+//         auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
+//         RCLCPP_WARN(get_node()->get_logger(),
+//           "SimpleMapsManager::update: Trying to update wrong coordinate (%lf, %lf) (%lu, %lu)",
+//           p.x, p.y, cx, cy);
+//       }
     }
   }
 
