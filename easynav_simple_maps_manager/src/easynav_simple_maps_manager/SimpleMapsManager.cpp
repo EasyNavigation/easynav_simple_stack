@@ -29,6 +29,8 @@
 namespace easynav
 {
 
+using std::placeholders::_1;
+
 std::expected<void, std::string>
 SimpleMapsManager::on_initialize()
 {
@@ -64,6 +66,14 @@ SimpleMapsManager::on_initialize()
 
   dynamic_occ_pub_ = node->create_publisher<nav_msgs::msg::OccupancyGrid>(
     node->get_name() + std::string("/") + plugin_name + "/dynamic_map", 100);
+
+  incoming_map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+    node->get_name() + std::string("/") + plugin_name + "/incoming_map",
+    rclcpp::QoS(1).transient_local().reliable(),
+    [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
+      static_map_->from_occupancy_grid(*msg);
+      dynamic_map_->from_occupancy_grid(*msg);
+    });
 
   static_map_->to_occupancy_grid(static_grid_msg_);
   static_grid_msg_.header.frame_id = "map";
@@ -122,12 +132,6 @@ SimpleMapsManager::update(const NavState & nav_state)
         auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
         dynamic_map_->at(cx, cy) = 1;
       }
-//       else {
-//         auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-//         RCLCPP_WARN(get_node()->get_logger(),
-//           "SimpleMapsManager::update: Trying to update wrong coordinate (%lf, %lf) (%lu, %lu)",
-//           p.x, p.y, cx, cy);
-//       }
     }
   }
 

@@ -1,6 +1,21 @@
 // Copyright 2025 Intelligent Robotics Lab
 //
-// Licensed under the GNU General Public License v3.0.
+// This file is part of the project Easy Navigation (EasyNav in short)
+// licensed under the GNU General Public License v3.0.
+// See <http://www.gnu.org/licenses/> for details.
+//
+// Easy Navigation program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtest/gtest.h>
 
@@ -77,4 +92,41 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
 
   auto cell2 = map_ptr->metric_to_cell(-1.0, -1.0);
   EXPECT_TRUE(map_ptr->at(cell2.first, cell2.second));
+}
+
+/// \brief Map loading via subscription test
+TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
+{
+  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node2");
+  auto manager = std::make_shared<easynav::SimpleMapsManager>();
+  manager->initialize(node, "test2");
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node->get_node_base_interface());
+
+  rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr pub =
+    node->create_publisher<nav_msgs::msg::OccupancyGrid>(
+    "test_node2/test2/incoming_map", rclcpp::QoS(1).transient_local().reliable());
+
+
+  nav_msgs::msg::OccupancyGrid grid;
+  grid.header.frame_id = "map";
+  grid.info.width = 10;
+  grid.info.height = 10;
+  grid.info.resolution = 0.2;
+  grid.info.origin.position.x = -1.0;
+  grid.info.origin.position.y = -0.6;
+  grid.data.assign(100, 0);
+  grid.data[55] = 100;  // Mark cell (5,5) as occupied
+
+  pub->publish(grid);
+
+  executor.spin_some();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  auto static_map = std::dynamic_pointer_cast<easynav::SimpleMap>(manager->get_static_map());
+  ASSERT_TRUE(static_map != nullptr);
+
+  EXPECT_EQ(static_map->at(5, 5), 1);
+  EXPECT_EQ(static_map->at(1, 1), 0);
 }

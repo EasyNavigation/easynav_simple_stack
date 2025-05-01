@@ -26,7 +26,7 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
-#include <utility>  // std::pair
+#include <utility>
 #include <fstream>
 #include <sstream>
 
@@ -42,72 +42,107 @@ namespace easynav
 
 /**
  * @class SimpleMapsManager
- * @brief A default "simple" implementation for the Planner Method.
+ * @brief A plugin-based map manager using the SimpleMap data structure.
  *
- * This planning method does nothing. It serves as an example, and will be used as a default plugin implementation
- * if the navigation system configuration does not specify one.
+ * This manager implements a minimal mapping approach using boolean grid maps
+ * (SimpleMap) for both static and dynamic maps. It supports publishing and
+ * receiving ROS occupancy grids.
  */
 class SimpleMapsManager : public easynav::MapsManagerBase
 {
 public:
+  /**
+   * @brief Default constructor.
+   */
   SimpleMapsManager() = default;
+
+  /**
+   * @brief Destructor.
+   */
   ~SimpleMapsManager() = default;
 
   /**
-   * @brief Initialize the planning method.
+   * @brief Initializes the maps manager.
    *
-   * It is not required to override this method. Only if the derived class
-   * requires further initialization than the provided by the base class.
+   * Creates necessary publishers/subscribers and initializes the map instances.
+   *
+   * @return std::expected<void, std::string> Success or error string.
    */
   virtual std::expected<void, std::string> on_initialize() override;
 
   /**
-   * @brief Get the current path.
+   * @brief Returns the current static map.
    *
-   * This method should return the last path computed.
-   * It should not run the planning algorithm (see update method).
-   *
-   * @return A TwistStamped message with the current path.
+   * @return Shared pointer to the static SimpleMap instance.
    */
   [[nodiscard]] virtual std::shared_ptr<MapsTypeBase> get_static_map() override;
 
   /**
-   * @brief Get the current path.
+   * @brief Returns the current dynamic map.
    *
-   * This method should return the last path computed.
-   * It should not run the planning algorithm (see update method).
-   *
-   * @return A TwistStamped message with the current path.
+   * @return Shared pointer to the dynamic SimpleMap instance.
    */
   [[nodiscard]] virtual std::shared_ptr<MapsTypeBase> get_dynamyc_map() override;
 
   /**
-   * @brief Run the path planning method and update the path.
+   * @brief Updates the internal maps using the current navigation state.
    *
-   * This method will be called by the system's PlannerNode to run the planning algorithm.
+   * Intended to be called periodically. May perform dynamic map updates
+   * based on new sensor data or internal state.
    *
-   * @param nav_state The current state of the navigation system.
+   * @param nav_state Current state of the navigation system.
    */
   virtual void update(const NavState & nav_state) override;
 
-
+  /**
+   * @brief Replaces the current static map.
+   *
+   * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
+   */
   void set_static_map(std::shared_ptr<MapsTypeBase> new_map);
+
+  /**
+   * @brief Replaces the current dynamic map.
+   *
+   * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
+   */
   void set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map);
 
 private:
   /**
-   * @brief Current static map.
+   * @brief Internal static map.
    */
   std::shared_ptr<SimpleMap> static_map_;
 
   /**
-   * @brief Current static map.
+   * @brief Internal dynamic map.
    */
   std::shared_ptr<SimpleMap> dynamic_map_;
 
+  /**
+   * @brief Publisher for the static occupancy grid.
+   */
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr static_occ_pub_;
+
+  /**
+   * @brief Publisher for the dynamic occupancy grid.
+   */
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr dynamic_occ_pub_;
-  nav_msgs::msg::OccupancyGrid static_grid_msg_, dynamic_grid_msg_;
+
+  /**
+   * @brief Subscriber for external incoming static map updates.
+   */
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr incoming_map_sub_;
+
+  /**
+   * @brief Cached occupancy grid message for the static map.
+   */
+  nav_msgs::msg::OccupancyGrid static_grid_msg_;
+
+  /**
+   * @brief Cached occupancy grid message for the dynamic map.
+   */
+  nav_msgs::msg::OccupancyGrid dynamic_grid_msg_;
 };
 
 }  // namespace easynav
