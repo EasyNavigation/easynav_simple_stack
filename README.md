@@ -2,45 +2,67 @@
 
 ## SimpleMapsManager Plugin for Easy Navigation
 
-This plugin provides a lightweight map management solution for the Easy Navigation (EasyNav) framework, using a simple 2D grid map based on standard C++ types (`SimpleMap`). It is designed to be efficient and easy to integrate into ROS 2 systems.
+The `SimpleMapsManager` plugin provides a lightweight, ROS 2-compatible map management component for the Easy Navigation (EasyNav) framework. It is based on a 2D boolean grid (`SimpleMap`) and is optimized for efficient updates and metric conversion. This plugin can handle both static and dynamic map layers, integrating sensor-based perception to update the dynamic map.
 
 ---
 
 ### Features
 
-- Supports loading maps from files or from `nav_msgs::msg::OccupancyGrid` messages.
-- Converts and publishes maps as `nav_msgs::msg::OccupancyGrid`.
-- Maintains both static and dynamic map layers.
-- Can be used as a plugin via the `pluginlib` infrastructure.
+- Loads static maps from disk or incoming `OccupancyGrid` messages.
+- Publishes static and dynamic map layers as `nav_msgs/msg/OccupancyGrid`.
+- Applies sensor updates to a dynamic map layer.
+- Can receive incoming maps via a subscriber interface.
+- Offers a service interface to save maps to the original file path at runtime.
+- Compatible with `pluginlib` for dynamic loading.
 
 ---
 
 ### Parameters
 
-All parameters must be specified in the namespace of the plugin (e.g., `my_manager.package`, `my_manager.map_path_file`):
+All parameters must be defined in the namespace corresponding to the plugin name (e.g., `my_plugin.package`, `my_plugin.map_path_file`):
 
-| Name                 | Type   | Description                                        | Default |
-|----------------------|--------|----------------------------------------------------|---------|
-| `plugin_name.package`            | string | Name of the ROS 2 package containing the map file. | `""`    |
-| `plugin_name.map_path_file`      | string | Relative path to the map file within the package.  | `""`    |
+| Name                        | Type   | Description                                                        | Default |
+|-----------------------------|--------|--------------------------------------------------------------------|---------|
+| `plugin_name.package`       | string | Name of the ROS 2 package containing the static map file.          | `""`    |
+| `plugin_name.map_path_file` | string | Path to the map file (relative to the specified package).          | `""`    |
 
-If both parameters are provided, the static map is loaded from the file at runtime.
+If both parameters are provided, the plugin loads the static map from the resolved file path during initialization.
 
 ---
 
 ### Topics
 
-| Topic name                            | Type                              | Direction | Description                                |
-|---------------------------------------|-----------------------------------|-----------|--------------------------------------------|
-| `<node>/<plugin_name>/map`                 | `nav_msgs/msg/OccupancyGrid`      | Publisher | Published static map (latched).            |
-| `<node>/<plugin_name>/dynamic_map`         | `nav_msgs/msg/OccupancyGrid`      | Publisher | Dynamic map updated with sensor data.      |
-| `<node>/<plugin_name>/incoming_map`        | `nav_msgs/msg/OccupancyGrid`      | Subscriber| Allows external modules to overwrite maps. |
+| Topic                                 | Type                              | Direction | Description                                    |
+|---------------------------------------|-----------------------------------|-----------|------------------------------------------------|
+| `<node>/<plugin_name>/map`            | `nav_msgs/msg/OccupancyGrid`      | Publisher | Published static map (latched).                |
+| `<node>/<plugin_name>/dynamic_map`    | `nav_msgs/msg/OccupancyGrid`      | Publisher | Dynamic map updated based on sensor data.      |
+| `<node>/<plugin_name>/incoming_map`   | `nav_msgs/msg/OccupancyGrid`      | Subscriber| Allows runtime map replacement via messages.   |
 
 ---
 
-### Usage
+### Services
 
-Declare and load the plugin in your component node:
+| Service                                | Type                     | Description                                        |
+|----------------------------------------|--------------------------|----------------------------------------------------|
+| `<node>/<plugin_name>/savemap`         | `std_srvs/srv/Trigger`   | Saves the current static map to its original path |
+
+---
+
+### File Format
+
+Map files used by `SimpleMap` follow a plain-text format:
+
+```
+<width> <height> <resolution> <origin_x> <origin_y>
+0 1 1 0 0 1 ...
+```
+
+- The first line contains metadata: width, height, resolution (meters/cell), origin x, origin y.
+- The second line is the grid content, in row-major order, using `0` for free and `1` for occupied cells.
+
+---
+
+### Example Plugin Configuration
 
 ```yaml
 maps_manager_node:
@@ -54,19 +76,16 @@ maps_manager_node:
 
 ---
 
-### File Format
+### Example Usage of Save Service
 
-Maps saved or loaded with `SimpleMap` have the following format:
+To save the current map to the original file location:
 
+```bash
+ros2 service call /<node>/simple/savemap std_srvs/srv/Trigger "{}"
 ```
-<width> <height> <resolution> <origin_x> <origin_y>
-0 0 1 0 0 1 ...
-```
-
-Where the second line contains one value per cell (`0` for false, `1` for true), in row-major order.
 
 ---
 
 ### License
 
-This plugin is part of the Easy Navigation (EasyNav) framework and is licensed under the GNU General Public License v3.0.
+This plugin is part of the [Easy Navigation (EasyNav)](https://github.com/IntelligentRoboticsLab/easy_navigation) framework and is released under the GNU General Public License v3.0.
