@@ -29,7 +29,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 
 #include "easynav_common/types/MapTypeBase.hpp"
-#include "easynav_simple_maps_manager/SimpleMap.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 namespace easynav
 {
@@ -144,6 +144,25 @@ SimpleMap::to_occupancy_grid(nav_msgs::msg::OccupancyGrid & grid_msg) const
   }
 }
 
+void
+SimpleMap::from_occupancy_grid(const nav_msgs::msg::OccupancyGrid & grid_msg)
+{
+  initialize(
+    grid_msg.info.width,
+    grid_msg.info.height,
+    grid_msg.info.resolution,
+    grid_msg.info.origin.position.x,
+    grid_msg.info.origin.position.y,
+    false);  // valor inicial: libre (false)
+
+  for (std::size_t y = 0; y < height_; ++y) {
+    for (std::size_t x = 0; x < width_; ++x) {
+      std::size_t idx = y * width_ + x;
+      int8_t val = grid_msg.data[idx];
+      data_[idx] = (val >= 50);
+    }
+  }
+}
 
 bool
 SimpleMap::save_to_file(const std::string & path) const

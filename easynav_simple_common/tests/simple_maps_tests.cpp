@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "easynav_simple_maps_manager/SimpleMap.hpp"
-#include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
@@ -18,21 +17,6 @@ class SimpleMapTest : public ::testing::Test
 protected:
   void SetUp() override {}
   void TearDown() override {}
-};
-
-/// \brief Fixture for SimpleMapsManager tests (minimal)
-class SimpleMapsManagerTest : public ::testing::Test
-{
-protected:
-  void SetUp() override
-  {
-    rclcpp::init(0, nullptr);
-  }
-
-  void TearDown() override
-  {
-    rclcpp::shutdown();
-  }
 };
 
 /// \brief Basic access and fill tests
@@ -106,53 +90,51 @@ TEST_F(SimpleMapTest, SaveLoadMap)
   EXPECT_FALSE(loaded_map.at(0, 0));
 }
 
-/// \brief Dynamic map update tests
-TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
+/// \brief Conversion to and from OccupancyGrid test
+TEST_F(SimpleMapTest, OccupancyGridConversion)
 {
-  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
-  auto manager = std::make_shared<easynav::SimpleMapsManager>();
-  manager->initialize(node, "test");
+  easynav::SimpleMap original_map;
+  original_map.initialize(4, 3, 0.2, -1.0, -0.6);
+  original_map.at(0, 0) = true;
+  original_map.at(1, 1) = true;
+  original_map.at(3, 2) = true;
 
-  auto static_map = std::make_shared<easynav::SimpleMap>();
-  static_map->initialize(30, 30, 0.1, -1.5, -1.5, 0.0);
-  manager->set_static_map(static_map);
+  nav_msgs::msg::OccupancyGrid grid_msg;
+  original_map.to_occupancy_grid(grid_msg);
 
-  easynav::NavState navstate;
-  auto perception = std::make_shared<easynav::Perception>();
+  EXPECT_EQ(grid_msg.info.width, 4u);
+  EXPECT_EQ(grid_msg.info.height, 3u);
+  EXPECT_NEAR(grid_msg.info.resolution, 0.2, 1e-6);
+  EXPECT_NEAR(grid_msg.info.origin.position.x, -1.0, 1e-6);
+  EXPECT_NEAR(grid_msg.info.origin.position.y, -0.6, 1e-6);
 
-  perception->data.points.resize(6);
-  perception->data.points[0].x = 1.0;
-  perception->data.points[0].y = 1.0;
-  perception->data.points[0].z = 0.0;
-  perception->data.points[1].x = -1.0;
-  perception->data.points[1].y = -1.0;
-  perception->data.points[1].z = 0.0;
-  perception->data.points[2].x = -10.0;
-  perception->data.points[2].y = -1.0;
-  perception->data.points[2].z = 0.0;
-  perception->data.points[3].x = 10.0;
-  perception->data.points[3].y = -1.0;
-  perception->data.points[3].z = 0.0;
-  perception->data.points[4].x = 1.0;
-  perception->data.points[4].y = -10.0;
-  perception->data.points[4].z = 0.0;
-  perception->data.points[5].x = 1.0;
-  perception->data.points[5].y = 10.0;
-  perception->data.points[5].z = 0.0;
+  std::vector<int> expected_indices = {
+    0 * 4 + 0,  // (0,0)
+    1 * 4 + 1,  // (1,1)
+    2 * 4 + 3   // (3,2)
+  };
 
-  perception->stamp = rclcpp::Time(0);
-  perception->frame_id = "map";
-  perception->valid = true;
-  navstate.perceptions.push_back(perception);
+  for (std::size_t i = 0; i < grid_msg.data.size(); ++i) {
+    bool is_occupied = std::find(expected_indices.begin(),
+      expected_indices.end(), i) != expected_indices.end();
+    EXPECT_EQ(grid_msg.data[i], is_occupied ? 100 : 0);
+  }
 
-  manager->update(navstate);
+  easynav::SimpleMap recovered_map;
+  recovered_map.from_occupancy_grid(grid_msg);
 
-  auto map_ptr = std::dynamic_pointer_cast<easynav::SimpleMap>(manager->get_dynamyc_map());
-  ASSERT_TRUE(map_ptr != nullptr);
+  EXPECT_EQ(recovered_map.width(), 4u);
+  EXPECT_EQ(recovered_map.height(), 3u);
+  EXPECT_NEAR(recovered_map.resolution(), 0.2, 1e-6);
+  EXPECT_NEAR(recovered_map.origin_x(), -1.0, 1e-6);
+  EXPECT_NEAR(recovered_map.origin_y(), -0.6, 1e-6);
 
-  auto cell1 = map_ptr->metric_to_cell(1.0, 1.0);
-  EXPECT_TRUE(map_ptr->at(cell1.first, cell1.second));
-
-  auto cell2 = map_ptr->metric_to_cell(-1.0, -1.0);
-  EXPECT_TRUE(map_ptr->at(cell2.first, cell2.second));
+  for (std::size_t y = 0; y < 3; ++y) {
+    for (std::size_t x = 0; x < 4; ++x) {
+      EXPECT_EQ(
+        recovered_map.at(x, y),
+        original_map.at(x, y)
+      ) << "Mismatch at (" << x << "," << y << ")";
+    }
+  }
 }

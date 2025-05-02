@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>easynav_simple_maps_manager</name>
+  <name>easynav_simple_common</name>
   <version>0.0.1</version>
-  <description>Easy Navigation: Simple MapsManager package.</description>
+  <description>Easy Navigation: Simple Common package.</description>
   <maintainer email="fmrico@gmail.com">fmrico</maintainer>
   <license>GPL-3.0-only</license>
 
@@ -17,9 +17,6 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>ament_index_cpp</depend>
-  <depend>easynav_simple_common</depend>
-  <depend>std_srvs</depend>
-  <depend>yaets</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

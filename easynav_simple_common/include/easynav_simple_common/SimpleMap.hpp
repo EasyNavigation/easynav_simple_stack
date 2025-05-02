@@ -163,6 +163,16 @@ public:
   void to_occupancy_grid(nav_msgs::msg::OccupancyGrid & grid_msg) const;
 
   /**
+   * @brief Load map data and metadata from a nav_msgs::msg::OccupancyGrid message.
+   *
+   * This function resizes the internal grid to match the occupancy grid dimensions,
+   * sets the resolution and origin, and copies the data.
+   *
+   * @param grid_msg The occupancy grid message to load from.
+   */
+  void from_occupancy_grid(const nav_msgs::msg::OccupancyGrid & grid_msg);
+
+  /**
   * @brief Saves the map to a file, including metadata and cell data.
   * @param path Path to the output file.
   * @return true if the file was written successfully, false otherwise.

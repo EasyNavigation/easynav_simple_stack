@@ -29,6 +29,17 @@
 namespace easynav
 {
 
+using std::placeholders::_1;
+
+
+SimpleMapsManager::~SimpleMapsManager()
+{
+  if (session_ != nullptr) {
+    session_->stop();
+  }
+}
+
+
 std::expected<void, std::string>
 SimpleMapsManager::on_initialize()
 {
@@ -49,12 +60,13 @@ SimpleMapsManager::on_initialize()
     std::string pkgpath;
     try {
       pkgpath = ament_index_cpp::get_package_share_directory(package_name);
+      map_path_ = pkgpath + "/" + map_path_file;
     } catch(ament_index_cpp::PackageNotFoundError & ex) {
       return std::unexpected("Package " + package_name + " not found. Error: " + ex.what());
     }
 
-    if (!static_map_->load_from_file(pkgpath + "/" + map_path_file)) {
-      return std::unexpected("File [" + pkgpath + "/" + map_path_file + "] not found");
+    if (!static_map_->load_from_file(map_path_)) {
+      return std::unexpected("File [" + map_path_ + "] not found");
     }
   }
 
@@ -65,11 +77,47 @@ SimpleMapsManager::on_initialize()
   dynamic_occ_pub_ = node->create_publisher<nav_msgs::msg::OccupancyGrid>(
     node->get_name() + std::string("/") + plugin_name + "/dynamic_map", 100);
 
+  incoming_map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+    node->get_name() + std::string("/") + plugin_name + "/incoming_map",
+    rclcpp::QoS(1).transient_local().reliable(),
+    [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
+      static_map_->from_occupancy_grid(*msg);
+      dynamic_map_->from_occupancy_grid(*msg);
+
+      static_map_->to_occupancy_grid(static_grid_msg_);
+      static_grid_msg_.header.frame_id = "map";
+      static_grid_msg_.header.stamp = this->get_node()->now();
+
+      static_occ_pub_->publish(static_grid_msg_);
+    });
+
+  savemap_srv_ = node->create_service<std_srvs::srv::Trigger>(
+    node->get_name() + std::string("/") + plugin_name + "/savemap",
+    [this](
+      const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+      std::shared_ptr<std_srvs::srv::Trigger::Response> response)
+    {
+      (void)request;
+      if (!static_map_->save_to_file(map_path_)) {
+        response->success = false;
+        response->message = "Failed to save map to: " + map_path_;
+      } else {
+        response->success = true;
+        response->message = "Map successfully saved to: " + map_path_;
+      }
+    });
+
   static_map_->to_occupancy_grid(static_grid_msg_);
   static_grid_msg_.header.frame_id = "map";
   static_grid_msg_.header.stamp = node->now();
 
   static_occ_pub_->publish(static_grid_msg_);
+
+  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(node->get_clock());
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_, node,
+    true);
+
+  session_ = std::make_shared<yaets::TraceSession>("/tmp/SimpleMapsManager.log");
 
   return {};
 }
@@ -113,20 +161,18 @@ SimpleMapsManager::set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map)
 void
 SimpleMapsManager::update(const NavState & nav_state)
 {
+  TRACE_EVENT(*session_);
   dynamic_map_->deep_copy(*static_map_);
 
-  // Hay que cambiar las coordenadas a map
-  for (const auto & sensor : nav_state.perceptions) {
-    for (const auto & p : sensor->data) {
-      if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
-        auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-        dynamic_map_->at(cx, cy) = 1;
-      } else {
-        auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-        RCLCPP_WARN(get_node()->get_logger(),
-          "SimpleMapsManager::update: Trying to update wrong coordinate (%lf, %lf) (%lu, %lu)",
-          p.x, p.y, cx, cy);
-      }
+  auto cloned = PerceptionsOps(nav_state.perceptions).clone();
+  auto fused = PerceptionsOps(cloned).downsample(dynamic_map_->resolution())
+    .fuse("map", *tf_buffer_)
+    .filter({NAN, NAN, 0.1}, {NAN, NAN, NAN});
+
+  for (const auto & p : fused.fused_data()) {
+    if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
+      auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
+      dynamic_map_->at(cx, cy) = 1;
     }
   }
 
