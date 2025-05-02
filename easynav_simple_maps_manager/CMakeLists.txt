@@ -18,6 +18,7 @@ find_package(pluginlib REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(easynav_simple_common REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(yaets REQUIRED)
 
 set(dependencies
   rclcpp
@@ -30,6 +31,7 @@ set(dependencies
   ament_index_cpp
   easynav_simple_common
   std_srvs
+  yaets
 )
 
 include_directories(include)

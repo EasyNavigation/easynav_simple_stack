@@ -34,9 +34,14 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_listener.h"
+
 #include "easynav_core/MapsManagerBase.hpp"
 #include "easynav_common/types/MapTypeBase.hpp"
 #include "easynav_simple_common/SimpleMap.hpp"
+
+#include "yaets/tracing.hpp"
 
 namespace easynav
 {
@@ -60,7 +65,7 @@ public:
   /**
    * @brief Destructor.
    */
-  ~SimpleMapsManager() = default;
+  ~SimpleMapsManager();
 
   /**
    * @brief Initializes the maps manager.
@@ -110,14 +115,12 @@ public:
   void set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map);
 
 protected:
-
   /**
    * @brief Full path to the map file.
    */
   std::string map_path_;
 
 private:
-
   /**
    * @brief Internal static map.
    */
@@ -157,6 +160,20 @@ private:
    * @brief Cached occupancy grid message for the dynamic map.
    */
   nav_msgs::msg::OccupancyGrid dynamic_grid_msg_;
+
+  /**
+   * @brief Buffer storing transformations between frames.
+   */
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
+
+  /**
+   * @brief Transform listener that populates the tf buffer.
+   */
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+
+  pcl::PointCloud<pcl::PointXYZ> fused_perception_;
+
+  std::shared_ptr<yaets::TraceSession> session_;
 };
 
 }  // namespace easynav

@@ -63,22 +63,22 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->data.points.resize(6);
   perception->data.points[0].x = 1.0;
   perception->data.points[0].y = 1.0;
-  perception->data.points[0].z = 0.0;
+  perception->data.points[0].z = 0.2;
   perception->data.points[1].x = -1.0;
   perception->data.points[1].y = -1.0;
-  perception->data.points[1].z = 0.0;
+  perception->data.points[1].z = 0.2;
   perception->data.points[2].x = -10.0;
   perception->data.points[2].y = -1.0;
-  perception->data.points[2].z = 0.0;
+  perception->data.points[2].z = 0.2;
   perception->data.points[3].x = 10.0;
   perception->data.points[3].y = -1.0;
-  perception->data.points[3].z = 0.0;
+  perception->data.points[3].z = 0.2;
   perception->data.points[4].x = 1.0;
   perception->data.points[4].y = -10.0;
-  perception->data.points[4].z = 0.0;
+  perception->data.points[4].z = 0.2;
   perception->data.points[5].x = 1.0;
   perception->data.points[5].y = 10.0;
-  perception->data.points[5].z = 0.0;
+  perception->data.points[5].z = 0.2;
 
   perception->stamp = rclcpp::Time(0);
   perception->frame_id = "map";
@@ -111,7 +111,6 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
     node->create_publisher<nav_msgs::msg::OccupancyGrid>(
     "test_node2/test2/incoming_map", rclcpp::QoS(1).transient_local().reliable());
 
-
   nav_msgs::msg::OccupancyGrid grid;
   grid.header.frame_id = "map";
   grid.info.width = 10;
@@ -134,6 +133,11 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   EXPECT_EQ(static_map->at(1, 1), 0);
 }
 
+class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
+public:
+  void force_path(const std::string & path) {map_path_ = path;}
+};
+
 TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_savemap_node");
@@ -149,13 +153,7 @@ TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
   const std::string test_map_file = "/tmp/savemap_test_map.txt";
   const std::string service_name = "/test_savemap_node/test_savemap/savemap";
 
-  {
-    class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
-    public:
-      void force_path(const std::string & path) { map_path_ = path; }
-    };
-    std::static_pointer_cast<FriendSimpleMapsManager>(manager)->force_path(test_map_file);
-  }
+  std::static_pointer_cast<FriendSimpleMapsManager>(manager)->force_path(test_map_file);
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node->get_node_base_interface());

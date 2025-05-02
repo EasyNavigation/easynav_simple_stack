@@ -31,6 +31,15 @@ namespace easynav
 
 using std::placeholders::_1;
 
+
+SimpleMapsManager::~SimpleMapsManager()
+{
+  if (session_ != nullptr) {
+    session_->stop();
+  }
+}
+
+
 std::expected<void, std::string>
 SimpleMapsManager::on_initialize()
 {
@@ -74,6 +83,12 @@ SimpleMapsManager::on_initialize()
     [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
       static_map_->from_occupancy_grid(*msg);
       dynamic_map_->from_occupancy_grid(*msg);
+
+      static_map_->to_occupancy_grid(static_grid_msg_);
+      static_grid_msg_.header.frame_id = "map";
+      static_grid_msg_.header.stamp = this->get_node()->now();
+
+      static_occ_pub_->publish(static_grid_msg_);
     });
 
   savemap_srv_ = node->create_service<std_srvs::srv::Trigger>(
@@ -97,6 +112,12 @@ SimpleMapsManager::on_initialize()
   static_grid_msg_.header.stamp = node->now();
 
   static_occ_pub_->publish(static_grid_msg_);
+
+  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(node->get_clock());
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_, node,
+    true);
+
+  session_ = std::make_shared<yaets::TraceSession>("/tmp/SimpleMapsManager.log");
 
   return {};
 }
@@ -140,15 +161,18 @@ SimpleMapsManager::set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map)
 void
 SimpleMapsManager::update(const NavState & nav_state)
 {
+  TRACE_EVENT(*session_);
   dynamic_map_->deep_copy(*static_map_);
 
-  // Hay que cambiar las coordenadas a map
-  for (const auto & sensor : nav_state.perceptions) {
-    for (const auto & p : sensor->data) {
-      if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
-        auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-        dynamic_map_->at(cx, cy) = 1;
-      }
+  auto cloned = PerceptionsOps(nav_state.perceptions).clone();
+  auto fused = PerceptionsOps(cloned).downsample(dynamic_map_->resolution())
+    .fuse("map", *tf_buffer_)
+    .filter({NAN, NAN, 0.1}, {NAN, NAN, NAN});
+
+  for (const auto & p : fused.fused_data()) {
+    if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
+      auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
+      dynamic_map_->at(cx, cy) = 1;
     }
   }
 
