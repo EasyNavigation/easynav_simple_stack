@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['height_0',['height',['../classeasynav_1_1SimpleMap.html#a26acb32e9b64581a57297caebb3941db',1,'easynav::SimpleMap']]]
+  ['update_0',['update',['../classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa',1,'easynav::SimpleMapsManager']]]
 ];

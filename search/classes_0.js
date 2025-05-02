@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mapstypebase_0',['MapsTypeBase',['../classMapsTypeBase.html',1,'']]]
+  ['friendsimplemapsmanager_0',['FriendSimpleMapsManager',['../classFriendSimpleMapsManager.html',1,'']]]
 ];

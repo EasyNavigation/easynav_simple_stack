@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,53,56"/>
-<area shape="rect" id="Node000001" href="$classSimpleMapTest.html" title="Fixture for SimpleMap tests (minimal)" alt="" coords="129,5,242,31"/>
-<area shape="poly" id="edge3_Node000000_Node000001" title=" " alt="" coords="67,35,128,25,129,30,68,40"/>
-<area shape="rect" id="Node000002" href="$classSimpleMapsManagerTest.html" title="Fixture for SimpleMapsManager tests (minimal)" alt="" coords="101,55,270,80"/>
-<area shape="poly" id="edge4_Node000000_Node000002" title=" " alt="" coords="68,47,101,52,100,57,68,52"/>
-</map>

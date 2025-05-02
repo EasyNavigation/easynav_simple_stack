@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['deep_5fcopy_0',['deep_copy',['../classeasynav_1_1SimpleMap.html#ac3bf67184083f4b9a7b921a5789b3d1c',1,'easynav::SimpleMap']]]
+  ['on_5finitialize_0',['on_initialize',['../classeasynav_1_1SimpleMapsManager.html#aa09f4316ce265b452c96e6d74101cd76',1,'easynav::SimpleMapsManager']]]
 ];

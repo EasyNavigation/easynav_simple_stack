@@ -88,6 +88,84 @@ $(function(){ initResizable(false); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a></p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+SimpleMapsManager Plugin for Easy Navigation</h1>
+<p>The <code>SimpleMapsManager</code> plugin provides a lightweight, ROS 2-compatible map management component for the Easy Navigation (EasyNav) framework. It is based on a 2D boolean grid (<code>SimpleMap</code>) and is optimized for efficient updates and metric conversion. This plugin can handle both static and dynamic map layers, integrating sensor-based perception to update the dynamic map.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md3"></a>
+Features</h2>
+<ul>
+<li>Loads static maps from disk or incoming <code>OccupancyGrid</code> messages.</li>
+<li>Publishes static and dynamic map layers as <code>nav_msgs/msg/OccupancyGrid</code>.</li>
+<li>Applies sensor updates to a dynamic map layer.</li>
+<li>Can receive incoming maps via a subscriber interface.</li>
+<li>Offers a service interface to save maps to the original file path at runtime.</li>
+<li>Compatible with <code>pluginlib</code> for dynamic loading.</li>
+</ul>
+<hr  />
+<h2><a class="anchor" id="autotoc_md5"></a>
+Parameters</h2>
+<p>All parameters must be defined in the namespace corresponding to the plugin name (e.g., <code>my_plugin.package</code>, <code>my_plugin.map_path_file</code>):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Name   </th><th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Description   </th><th class="markdownTableHeadNone">Default    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>plugin_name.package</code>   </td><td class="markdownTableBodyNone">string   </td><td class="markdownTableBodyNone">Name of the ROS 2 package containing the static map file.   </td><td class="markdownTableBodyNone"><code>""</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>plugin_name.map_path_file</code>   </td><td class="markdownTableBodyNone">string   </td><td class="markdownTableBodyNone">Path to the map file (relative to the specified package).   </td><td class="markdownTableBodyNone"><code>""</code>   </td></tr>
+</table>
+<p>If both parameters are provided, the plugin loads the static map from the resolved file path during initialization.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md7"></a>
+Topics</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Topic   </th><th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Direction   </th><th class="markdownTableHeadNone">Description    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>&lt;node&gt;/&lt;plugin_name&gt;/map</code>   </td><td class="markdownTableBodyNone"><code>nav_msgs/msg/OccupancyGrid</code>   </td><td class="markdownTableBodyNone">Publisher   </td><td class="markdownTableBodyNone">Published static map (latched).    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>&lt;node&gt;/&lt;plugin_name&gt;/dynamic_map</code>   </td><td class="markdownTableBodyNone"><code>nav_msgs/msg/OccupancyGrid</code>   </td><td class="markdownTableBodyNone">Publisher   </td><td class="markdownTableBodyNone">Dynamic map updated based on sensor data.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>&lt;node&gt;/&lt;plugin_name&gt;/incoming_map</code>   </td><td class="markdownTableBodyNone"><code>nav_msgs/msg/OccupancyGrid</code>   </td><td class="markdownTableBodyNone">Subscriber   </td><td class="markdownTableBodyNone">Allows runtime map replacement via messages.   </td></tr>
+</table>
+<hr  />
+<h2><a class="anchor" id="autotoc_md9"></a>
+Services</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Service   </th><th class="markdownTableHeadNone">Type   </th><th class="markdownTableHeadNone">Description    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>&lt;node&gt;/&lt;plugin_name&gt;/savemap</code>   </td><td class="markdownTableBodyNone"><code>std_srvs/srv/Trigger</code>   </td><td class="markdownTableBodyNone">Saves the current static map to its original path   </td></tr>
+</table>
+<hr  />
+<h2><a class="anchor" id="autotoc_md11"></a>
+File Format</h2>
+<p>Map files used by <code>SimpleMap</code> follow a plain-text format:</p>
+<div class="fragment"><div class="line">&lt;width&gt; &lt;height&gt; &lt;resolution&gt; &lt;origin_x&gt; &lt;origin_y&gt;</div>
+<div class="line">0 1 1 0 0 1 ...</div>
+</div><!-- fragment --><ul>
+<li>The first line contains metadata: width, height, resolution (meters/cell), origin x, origin y.</li>
+<li>The second line is the grid content, in row-major order, using <code>0</code> for free and <code>1</code> for occupied cells.</li>
+</ul>
+<hr  />
+<h2><a class="anchor" id="autotoc_md13"></a>
+Example Plugin Configuration</h2>
+<div class="fragment"><div class="line">maps_manager_node:</div>
+<div class="line">  ros__parameters:</div>
+<div class="line">    maps_manager_plugins:</div>
+<div class="line">      - simple</div>
+<div class="line">    simple:</div>
+<div class="line">      package: &quot;my_maps_pkg&quot;</div>
+<div class="line">      map_path_file: &quot;maps/warehouse.map&quot;</div>
+</div><!-- fragment --><hr  />
+<h2><a class="anchor" id="autotoc_md15"></a>
+Example Usage of Save Service</h2>
+<p>To save the current map to the original file location:</p>
+<div class="fragment"><div class="line">ros2 service call /&lt;node&gt;/simple/savemap std_srvs/srv/Trigger &quot;{}&quot;</div>
+</div><!-- fragment --><hr  />
+<h2><a class="anchor" id="autotoc_md17"></a>
+License</h2>
+<p>This plugin is part of the <a href="https://github.com/IntelligentRoboticsLab/easy_navigation">Easy Navigation (EasyNav)</a> framework and is released under the GNU General Public License v3.0. </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

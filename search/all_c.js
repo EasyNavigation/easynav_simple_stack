@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['readme_2emd_0',['README.md',['../README_8md.html',1,'']]],
-  ['resolution_1',['resolution',['../classeasynav_1_1SimpleMap.html#afc6559248e4b9b26b5502fc3cf3be354',1,'easynav::SimpleMap']]]
+  ['update_0',['update',['../classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa',1,'easynav::SimpleMapsManager']]],
+  ['usage_20of_20save_20service_1',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]]
 ];
