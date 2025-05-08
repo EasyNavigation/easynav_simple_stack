@@ -20,8 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "easynav_simple_common/SimpleMap.hpp"
-#include "easynav_common/RTTFBuffer.hpp"
-#include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
+#include "easynav_simple_localizer/AMCLLocalizer.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
@@ -31,8 +30,8 @@
 #include <memory>
 #include <fstream>
 
-/// \brief Fixture for SimpleMapsManager tests (minimal)
-class SimpleMapsManagerTest : public ::testing::Test
+/// \brief Fixture for AMCLLocalizer tests (minimal)
+class AMCLLocalizerTest : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -48,14 +47,11 @@ protected:
 
 
 /// \brief Dynamic map update tests
-TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
+TEST_F(AMCLLocalizerTest, BasicDynamicUpdate)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
-  auto manager = std::make_shared<easynav::SimpleMapsManager>();
+  auto manager = std::make_shared<easynav::AMCLLocalizer>();
   manager->initialize(node, "test");
-
-  auto tf_buffer = easynav::RTTFBuffer::getInstance(node->get_clock());
-  tf2_ros::TransformListener tf_listener(*tf_buffer, node, true);
 
   auto static_map = std::make_shared<easynav::SimpleMap>();
   static_map->initialize(30, 30, 0.1, -1.5, -1.5, 0.0);
@@ -91,8 +87,7 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
 
   manager->update(navstate);
 
-  auto map_ptr = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.dynamic"]);
+  auto map_ptr = std::dynamic_pointer_cast<easynav::SimpleMap>(manager->get_dynamyc_map());
   ASSERT_TRUE(map_ptr != nullptr);
 
   auto cell1 = map_ptr->metric_to_cell(1.0, 1.0);
@@ -103,10 +98,10 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
 }
 
 /// \brief Map loading via subscription test
-TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
+TEST_F(AMCLLocalizerTest, IncomingOccupancyGridUpdatesMaps)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node2");
-  auto manager = std::make_shared<easynav::SimpleMapsManager>();
+  auto manager = std::make_shared<easynav::AMCLLocalizer>();
   manager->initialize(node, "test2");
 
   rclcpp::executors::SingleThreadedExecutor executor;
@@ -131,23 +126,22 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   executor.spin_some();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  auto static_map = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.static"]);
+  auto static_map = std::dynamic_pointer_cast<easynav::SimpleMap>(manager->get_static_map());
   ASSERT_TRUE(static_map != nullptr);
 
   EXPECT_EQ(static_map->at(5, 5), 1);
   EXPECT_EQ(static_map->at(1, 1), 0);
 }
 
-class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
+class FriendAMCLLocalizer : public easynav::AMCLLocalizer {
 public:
   void force_path(const std::string & path) {map_path_ = path;}
 };
 
-TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
+TEST_F(AMCLLocalizerTest, SavemapServiceWorks)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_savemap_node");
-  auto manager = std::make_shared<easynav::SimpleMapsManager>();
+  auto manager = std::make_shared<easynav::AMCLLocalizer>();
   manager->initialize(node, "test_savemap");
 
   auto static_map = std::make_shared<easynav::SimpleMap>();
@@ -159,7 +153,7 @@ TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
   const std::string test_map_file = "/tmp/savemap_test_map.txt";
   const std::string service_name = "/test_savemap_node/test_savemap/savemap";
 
-  std::static_pointer_cast<FriendSimpleMapsManager>(manager)->force_path(test_map_file);
+  std::static_pointer_cast<FriendAMCLLocalizer>(manager)->force_path(test_map_file);
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node->get_node_base_interface());

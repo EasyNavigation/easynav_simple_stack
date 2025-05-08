@@ -81,14 +81,7 @@ public:
    *
    * @return Shared pointer to the static SimpleMap instance.
    */
-  [[nodiscard]] virtual std::shared_ptr<MapsTypeBase> get_static_map() override;
-
-  /**
-   * @brief Returns the current dynamic map.
-   *
-   * @return Shared pointer to the dynamic SimpleMap instance.
-   */
-  [[nodiscard]] virtual std::shared_ptr<MapsTypeBase> get_dynamyc_map() override;
+  [[nodiscard]] virtual std::map<std::string, std::shared_ptr<MapsTypeBase>> get_maps() override;
 
   /**
    * @brief Updates the internal maps using the current navigation state.

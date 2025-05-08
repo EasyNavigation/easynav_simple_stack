@@ -122,16 +122,14 @@ SimpleMapsManager::on_initialize()
   return {};
 }
 
-std::shared_ptr<MapsTypeBase>
-SimpleMapsManager::get_static_map()
+std::map<std::string, std::shared_ptr<MapsTypeBase>>
+SimpleMapsManager::get_maps()
 {
-  return static_map_;
-}
+  std::map<std::string, std::shared_ptr<MapsTypeBase>> ret;
+  ret["simple.static"] = static_map_;
+  ret["simple.dynamic"] = dynamic_map_;
 
-std::shared_ptr<MapsTypeBase>
-SimpleMapsManager::get_dynamyc_map()
-{
-  return dynamic_map_;
+  return ret;
 }
 
 void
@@ -164,9 +162,10 @@ SimpleMapsManager::update(const NavState & nav_state)
   TRACE_EVENT(*session_);
   dynamic_map_->deep_copy(*static_map_);
 
+  std::cerr << "3*" << std::endl;
   auto fused = PerceptionsOpsView(nav_state.perceptions)
     .downsample(dynamic_map_->resolution())
-    .fuse("map", *tf_buffer_)
+    .fuse("map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .as_points(0);
 
