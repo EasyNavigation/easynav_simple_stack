@@ -164,12 +164,13 @@ SimpleMapsManager::update(const NavState & nav_state)
   TRACE_EVENT(*session_);
   dynamic_map_->deep_copy(*static_map_);
 
-  auto cloned = PerceptionsOps(nav_state.perceptions).clone();
-  auto fused = PerceptionsOps(cloned).downsample(dynamic_map_->resolution())
+  auto fused = PerceptionsOpsView(nav_state.perceptions)
+    .downsample(dynamic_map_->resolution())
     .fuse("map", *tf_buffer_)
-    .filter({NAN, NAN, 0.1}, {NAN, NAN, NAN});
+    ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
+    .as_points(0);
 
-  for (const auto & p : fused.fused_data()) {
+  for (const auto & p : fused) {
     if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
       auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
       dynamic_map_->at(cx, cy) = 1;
