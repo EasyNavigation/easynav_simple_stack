@@ -223,8 +223,8 @@ AMCLLocalizer::on_initialize()
 
 void printTransform(const tf2::Transform & tf)
 {
-  const tf2::Vector3& origin = tf.getOrigin();
-  const tf2::Quaternion& rot = tf.getRotation();
+  const tf2::Vector3 & origin = tf.getOrigin();
+  const tf2::Quaternion & rot = tf.getRotation();
 
   std::cerr << "Translation: ["
             << origin.x() << ", "
@@ -258,15 +258,12 @@ AMCLLocalizer::update_rt(const NavState & nav_state)
 void
 AMCLLocalizer::update(const NavState & nav_state)
 {
-  
-  /*
-  correct(nav_state);
+  //correct(nav_state);
 
-  if (get_node()->now() - last_reseed_ > 1s) {
-    reseed();
-    last_reseed_ = get_node()->now();
-  }
-  */
+  // if (get_node()->now() - last_reseed_ > 1s) {
+  //   reseed();
+  //   last_reseed_ = get_node()->now();
+  // }
   publishParticles();
 }
 
@@ -309,7 +306,10 @@ void AMCLLocalizer::correct(const NavState & nav_state)
     .as_points(0);
 
   for (auto & particle : particles_) {
+    // std::cerr << particle.weight << " ---> ";
+
     int hits = 0;
+    int possible = 0;
 
     for (const auto & pt : filtered) {
       tf2::Vector3 pt_world = particle.pose * tf2::Vector3(pt.x, pt.y, pt.z);
@@ -321,24 +321,32 @@ void AMCLLocalizer::correct(const NavState & nav_state)
         if (map->at(cell_x, cell_y)) {
           ++hits;
         }
+        ++possible;
       } catch (const std::out_of_range & e) {
         continue;
       }
     }
 
-    particle.weight = static_cast<double>(hits) / static_cast<double>(filtered.size());
-  }
-
-  double total_weight = 0.0;
-  for (const auto & p : particles_) {
-    total_weight += p.weight;
-  }
-
-  if (total_weight > 0.0) {
-    for (auto & p : particles_) {
-      p.weight /= total_weight;
+    if (possible > 0) {
+      particle.weight = particle.weight + static_cast<double>(hits) / static_cast<double>(possible);
     }
+    // std::cerr << particle.weight << " hits = " << hits << " / " << possible << std::endl;
   }
+
+//   double total_weight = 0.0;
+//   for (const auto & p : particles_) {
+//     total_weight += p.weight;
+//   }
+//
+//   if (total_weight > 0.0) {
+//     for (auto & p : particles_) {
+//       p.weight /= total_weight;
+//       std::cerr << p.weight << " ";
+//     }
+//       std::cerr << std::endl;
+//
+//   }
+
 }
 
 void
@@ -348,6 +356,14 @@ AMCLLocalizer::reseed()
 
   const std::size_t N = particles_.size();
   const std::size_t N_top = N / 2;
+
+  double total_weight = 0.0;
+  for (const auto & p : particles_) {
+    total_weight += p.weight;
+  }
+  for (auto & p : particles_) {
+    p.weight /= total_weight;
+  }
 
   std::sort(particles_.begin(), particles_.end(),
     [](const Particle & a, const Particle & b) {
@@ -386,6 +402,8 @@ AMCLLocalizer::reseed()
     double dx = l00 * z0;
     double dy = l10 * z0 + l11 * z1;
 
+    // std::cerr << "[" << dx << ", " << dy << "]" << std::endl;
+
     tf2::Vector3 new_origin(origin.x() + dx, origin.y() + dy, 0.0);
 
     double roll, pitch, yaw;
@@ -397,10 +415,10 @@ AMCLLocalizer::reseed()
 
     particles_[i].pose.setOrigin(new_origin);
     particles_[i].pose.setRotation(q);
-    particles_[i].weight = 1.0;
+    particles_[i].weight = ref_particle.weight;
   }
 
-  double total_weight = 0.0;
+  total_weight = 0.0;
   for (const auto & p : particles_) {
     total_weight += p.weight;
   }
