@@ -148,59 +148,56 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  <span class="keyword">virtual</span> std::expected&lt;void, std::string&gt; <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#aa09f4316ce265b452c96e6d74101cd76">on_initialize</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span></div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  [[nodiscard]] <span class="keyword">virtual</span> std::shared_ptr&lt;MapsTypeBase&gt; <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#a7a608228397f52826ef2d19c08213924">get_static_map</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  [[nodiscard]] <span class="keyword">virtual</span> std::map&lt;std::string, std::shared_ptr&lt;MapsTypeBase&gt;&gt; <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#a0cb9356fcf60d1e7afa310e36e4fb401">get_maps</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  [[nodiscard]] <span class="keyword">virtual</span> std::shared_ptr&lt;MapsTypeBase&gt; <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#ad671b6dcce9f9600fb69a0ec24281b27">get_dynamyc_map</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa">update</a>(<span class="keyword">const</span> NavState &amp; nav_state) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa">update</a>(<span class="keyword">const</span> NavState &amp; nav_state) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#afd731e7385cf9a7a8cde5d2e3894b122">set_static_map</a>(std::shared_ptr&lt;MapsTypeBase&gt; new_map);</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#afd731e7385cf9a7a8cde5d2e3894b122">set_static_map</a>(std::shared_ptr&lt;MapsTypeBase&gt; new_map);</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#a8c4d7ed0b818e6fef996c467179f5f6f">set_dynamic_map</a>(std::shared_ptr&lt;MapsTypeBase&gt; new_map);</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="keyword">protected</span>:</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">  121</a></span>  std::string <a class="code hl_variable" href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">map_path_</a>;</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  std::shared_ptr&lt;SimpleMap&gt; static_map_;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  std::shared_ptr&lt;SimpleMap&gt; dynamic_map_;</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span></div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>  rclcpp::Publisher&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr static_occ_pub_;</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span></div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>  rclcpp::Publisher&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr dynamic_occ_pub_;</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span></div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  rclcpp::Subscription&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr incoming_map_sub_;</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span></div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>  rclcpp::Service&lt;std_srvs::srv::Trigger&gt;::SharedPtr savemap_srv_;</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>  nav_msgs::msg::OccupancyGrid static_grid_msg_;</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  nav_msgs::msg::OccupancyGrid dynamic_grid_msg_;</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span></div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>  std::shared_ptr&lt;tf2_ros::Buffer&gt; tf_buffer_;</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span></div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>  std::shared_ptr&lt;tf2_ros::TransformListener&gt; tf_listener_;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classeasynav_1_1SimpleMapsManager.html#a8c4d7ed0b818e6fef996c467179f5f6f">set_dynamic_map</a>(std::shared_ptr&lt;MapsTypeBase&gt; new_map);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">  114</a></span>  std::string <a class="code hl_variable" href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">map_path_</a>;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  std::shared_ptr&lt;SimpleMap&gt; static_map_;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  std::shared_ptr&lt;SimpleMap&gt; dynamic_map_;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>  rclcpp::Publisher&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr static_occ_pub_;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  rclcpp::Publisher&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr dynamic_occ_pub_;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>  rclcpp::Subscription&lt;nav_msgs::msg::OccupancyGrid&gt;::SharedPtr incoming_map_sub_;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>  rclcpp::Service&lt;std_srvs::srv::Trigger&gt;::SharedPtr savemap_srv_;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>  nav_msgs::msg::OccupancyGrid static_grid_msg_;</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>  nav_msgs::msg::OccupancyGrid dynamic_grid_msg_;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span></div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  std::shared_ptr&lt;tf2_ros::Buffer&gt; tf_buffer_;</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span></div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>  std::shared_ptr&lt;tf2_ros::TransformListener&gt; tf_listener_;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>  pcl::PointCloud&lt;pcl::PointXYZ&gt; fused_perception_;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>  std::shared_ptr&lt;yaets::TraceSession&gt; session_;</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>};</div>
+</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>}  <span class="comment">// namespace easynav</span></div>
+</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>  pcl::PointCloud&lt;pcl::PointXYZ&gt; fused_perception_;</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>  std::shared_ptr&lt;yaets::TraceSession&gt; session_;</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>};</div>
-</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>}  <span class="comment">// namespace easynav</span></div>
-</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span> </div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="preprocessor">#endif  </span><span class="comment">// EASYNAV_PLANNER__SIMPLEMAPMANAGER_HPP_</span></div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="preprocessor">#endif  </span><span class="comment">// EASYNAV_PLANNER__SIMPLEMAPMANAGER_HPP_</span></div>
+<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a0cb9356fcf60d1e7afa310e36e4fb401"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a0cb9356fcf60d1e7afa310e36e4fb401">easynav::SimpleMapsManager::get_maps</a></div><div class="ttdeci">virtual std::map&lt; std::string, std::shared_ptr&lt; MapsTypeBase &gt; &gt; get_maps() override</div><div class="ttdoc">Returns the current static map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:126</div></div>
 <div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a3925d4148c89751b46b5e3d5cd12ea4b"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a3925d4148c89751b46b5e3d5cd12ea4b">easynav::SimpleMapsManager::~SimpleMapsManager</a></div><div class="ttdeci">~SimpleMapsManager()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:35</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a7a608228397f52826ef2d19c08213924"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a7a608228397f52826ef2d19c08213924">easynav::SimpleMapsManager::get_static_map</a></div><div class="ttdeci">virtual std::shared_ptr&lt; MapsTypeBase &gt; get_static_map() override</div><div class="ttdoc">Returns the current static map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:126</div></div>
 <div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a7a87ead6697aa52403c721144327c71a"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a7a87ead6697aa52403c721144327c71a">easynav::SimpleMapsManager::SimpleMapsManager</a></div><div class="ttdeci">SimpleMapsManager()=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a8c4d7ed0b818e6fef996c467179f5f6f"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a8c4d7ed0b818e6fef996c467179f5f6f">easynav::SimpleMapsManager::set_dynamic_map</a></div><div class="ttdeci">void set_dynamic_map(std::shared_ptr&lt; MapsTypeBase &gt; new_map)</div><div class="ttdoc">Replaces the current dynamic map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:150</div></div>
+<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_a8c4d7ed0b818e6fef996c467179f5f6f"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#a8c4d7ed0b818e6fef996c467179f5f6f">easynav::SimpleMapsManager::set_dynamic_map</a></div><div class="ttdeci">void set_dynamic_map(std::shared_ptr&lt; MapsTypeBase &gt; new_map)</div><div class="ttdoc">Replaces the current dynamic map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:148</div></div>
 <div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_aa09f4316ce265b452c96e6d74101cd76"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#aa09f4316ce265b452c96e6d74101cd76">easynav::SimpleMapsManager::on_initialize</a></div><div class="ttdeci">virtual std::expected&lt; void, std::string &gt; on_initialize() override</div><div class="ttdoc">Initializes the maps manager.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:44</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_aa77083dd3e9128e426594ca1674a90e2"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">easynav::SimpleMapsManager::map_path_</a></div><div class="ttdeci">std::string map_path_</div><div class="ttdoc">Full path to the map file.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.hpp:121</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_ad671b6dcce9f9600fb69a0ec24281b27"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#ad671b6dcce9f9600fb69a0ec24281b27">easynav::SimpleMapsManager::get_dynamyc_map</a></div><div class="ttdeci">virtual std::shared_ptr&lt; MapsTypeBase &gt; get_dynamyc_map() override</div><div class="ttdoc">Returns the current dynamic map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:132</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_adbea5f6d7a91b4a1f7fa21d5a46c18aa"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa">easynav::SimpleMapsManager::update</a></div><div class="ttdeci">virtual void update(const NavState &amp;nav_state) override</div><div class="ttdoc">Updates the internal maps using the current navigation state.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:162</div></div>
-<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_afd731e7385cf9a7a8cde5d2e3894b122"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#afd731e7385cf9a7a8cde5d2e3894b122">easynav::SimpleMapsManager::set_static_map</a></div><div class="ttdeci">void set_static_map(std::shared_ptr&lt; MapsTypeBase &gt; new_map)</div><div class="ttdoc">Replaces the current static map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:138</div></div>
+<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_aa77083dd3e9128e426594ca1674a90e2"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#aa77083dd3e9128e426594ca1674a90e2">easynav::SimpleMapsManager::map_path_</a></div><div class="ttdeci">std::string map_path_</div><div class="ttdoc">Full path to the map file.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.hpp:114</div></div>
+<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_adbea5f6d7a91b4a1f7fa21d5a46c18aa"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#adbea5f6d7a91b4a1f7fa21d5a46c18aa">easynav::SimpleMapsManager::update</a></div><div class="ttdeci">virtual void update(const NavState &amp;nav_state) override</div><div class="ttdoc">Updates the internal maps using the current navigation state.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:160</div></div>
+<div class="ttc" id="aclasseasynav_1_1SimpleMapsManager_html_afd731e7385cf9a7a8cde5d2e3894b122"><div class="ttname"><a href="classeasynav_1_1SimpleMapsManager.html#afd731e7385cf9a7a8cde5d2e3894b122">easynav::SimpleMapsManager::set_static_map</a></div><div class="ttdeci">void set_static_map(std::shared_ptr&lt; MapsTypeBase &gt; new_map)</div><div class="ttdoc">Replaces the current static map.</div><div class="ttdef"><b>Definition</b> SimpleMapsManager.cpp:136</div></div>
 <div class="ttc" id="anamespaceeasynav_html"><div class="ttname"><a href="namespaceeasynav.html">easynav</a></div><div class="ttdef"><b>Definition</b> SimpleMapsManager.hpp:47</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

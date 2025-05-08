@@ -127,12 +127,9 @@ Collaboration diagram for SimpleMapsManager:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad671b6dcce9f9600fb69a0ec24281b27" id="r_ad671b6dcce9f9600fb69a0ec24281b27"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; MapsTypeBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad671b6dcce9f9600fb69a0ec24281b27">get_dynamyc_map</a> () override</td></tr>
-<tr class="memdesc:ad671b6dcce9f9600fb69a0ec24281b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current dynamic map.  <br /></td></tr>
-<tr class="separator:ad671b6dcce9f9600fb69a0ec24281b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a608228397f52826ef2d19c08213924" id="r_a7a608228397f52826ef2d19c08213924"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; MapsTypeBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a608228397f52826ef2d19c08213924">get_static_map</a> () override</td></tr>
-<tr class="memdesc:a7a608228397f52826ef2d19c08213924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current static map.  <br /></td></tr>
-<tr class="separator:a7a608228397f52826ef2d19c08213924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cb9356fcf60d1e7afa310e36e4fb401" id="r_a0cb9356fcf60d1e7afa310e36e4fb401"><td class="memItemLeft" align="right" valign="top">virtual std::map&lt; std::string, std::shared_ptr&lt; MapsTypeBase &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0cb9356fcf60d1e7afa310e36e4fb401">get_maps</a> () override</td></tr>
+<tr class="memdesc:a0cb9356fcf60d1e7afa310e36e4fb401"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current static map.  <br /></td></tr>
+<tr class="separator:a0cb9356fcf60d1e7afa310e36e4fb401"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa09f4316ce265b452c96e6d74101cd76" id="r_aa09f4316ce265b452c96e6d74101cd76"><td class="memItemLeft" align="right" valign="top">virtual std::expected&lt; void, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa09f4316ce265b452c96e6d74101cd76">on_initialize</a> () override</td></tr>
 <tr class="memdesc:aa09f4316ce265b452c96e6d74101cd76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the maps manager.  <br /></td></tr>
 <tr class="separator:aa09f4316ce265b452c96e6d74101cd76"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,8 +206,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad671b6dcce9f9600fb69a0ec24281b27" name="ad671b6dcce9f9600fb69a0ec24281b27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad671b6dcce9f9600fb69a0ec24281b27">&#9670;&#160;</a></span>get_dynamyc_map()</h2>
+<a id="a0cb9356fcf60d1e7afa310e36e4fb401" name="a0cb9356fcf60d1e7afa310e36e4fb401"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cb9356fcf60d1e7afa310e36e4fb401">&#9670;&#160;</a></span>get_maps()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -219,35 +216,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt; MapsTypeBase &gt; get_dynamyc_map </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the current dynamic map. </p>
-<dl class="section return"><dt>Returns</dt><dd>Shared pointer to the dynamic SimpleMap instance. </dd></dl>
-
-</div>
-</div>
-<a id="a7a608228397f52826ef2d19c08213924" name="a7a608228397f52826ef2d19c08213924"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a608228397f52826ef2d19c08213924">&#9670;&#160;</a></span>get_static_map()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::shared_ptr&lt; MapsTypeBase &gt; get_static_map </td>
+          <td class="memname">std::map&lt; std::string, std::shared_ptr&lt; MapsTypeBase &gt; &gt; get_maps </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
