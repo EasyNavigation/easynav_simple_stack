@@ -162,7 +162,6 @@ SimpleMapsManager::update(const NavState & nav_state)
   TRACE_EVENT(*session_);
   dynamic_map_->deep_copy(*static_map_);
 
-  std::cerr << "3*" << std::endl;
   auto fused = PerceptionsOpsView(nav_state.perceptions)
     .downsample(dynamic_map_->resolution())
     .fuse("map")
