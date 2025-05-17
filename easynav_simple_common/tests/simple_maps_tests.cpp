@@ -31,8 +31,8 @@ TEST_F(SimpleMapTest, BasicAccessAndFill)
   EXPECT_DOUBLE_EQ(map.origin_x(), -1.0);
   EXPECT_DOUBLE_EQ(map.origin_y(), -1.0);
 
-  for (std::size_t x = 0; x < 5; ++x) {
-    for (std::size_t y = 0; y < 5; ++y) {
+  for (int x = 0; x < 5; ++x) {
+    for (int y = 0; y < 5; ++y) {
       EXPECT_FALSE(map.at(x, y));
     }
   }
@@ -41,8 +41,8 @@ TEST_F(SimpleMapTest, BasicAccessAndFill)
   EXPECT_TRUE(map.at(2, 2));
 
   map.fill(true);
-  for (std::size_t x = 0; x < 5; ++x) {
-    for (std::size_t y = 0; y < 5; ++y) {
+  for (int x = 0; x < 5; ++x) {
+    for (int y = 0; y < 5; ++y) {
       EXPECT_TRUE(map.at(x, y));
     }
   }
@@ -129,8 +129,8 @@ TEST_F(SimpleMapTest, OccupancyGridConversion)
   EXPECT_NEAR(recovered_map.origin_x(), -1.0, 1e-6);
   EXPECT_NEAR(recovered_map.origin_y(), -0.6, 1e-6);
 
-  for (std::size_t y = 0; y < 3; ++y) {
-    for (std::size_t x = 0; x < 4; ++x) {
+  for (int y = 0; y < 3; ++y) {
+    for (int x = 0; x < 4; ++x) {
       EXPECT_EQ(
         recovered_map.at(x, y),
         original_map.at(x, y)

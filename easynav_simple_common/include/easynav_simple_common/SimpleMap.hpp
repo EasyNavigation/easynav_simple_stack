@@ -65,18 +65,18 @@ public:
    * @param initial_value Value to initialize all cells.
    */
   void initialize(
-    std::size_t width, std::size_t height, double resolution, double origin_x,
+    int width, int height, double resolution, double origin_x,
     double origin_y, bool initial_value = false);
 
   /**
    * @brief Returns the width (number of columns) of the map.
    */
-  std::size_t width() const {return width_;}
+  int width() const {return width_;}
 
   /**
    * @brief Returns the height (number of rows) of the map.
    */
-  std::size_t height() const {return height_;}
+  int height() const {return height_;}
 
   /**
    * @brief Returns the resolution (cell size in meters).
@@ -97,13 +97,13 @@ public:
    * @brief Access a cell (const) at (x, y).
    * @throw std::out_of_range if (x,y) is out of bounds.
    */
-  uint8_t at(std::size_t x, std::size_t y) const;
+  uint8_t at(int x, int y) const;
 
   /**
    * @brief Access a cell (non-const) at (x, y).
    * @throw std::out_of_range if (x,y) is out of bounds.
    */
-  uint8_t & at(std::size_t x, std::size_t y);
+  uint8_t & at(int x, int y);
 
   /**
    * @brief Set all cells to a given value.
@@ -137,7 +137,7 @@ public:
    * @param y Cell row index.
    * @return Pair (meters_x, meters_y).
    */
-  std::pair<double, double> cell_to_metric(std::size_t x, std::size_t y) const;
+  std::pair<double, double> cell_to_metric(int x, int y) const;
 
   /**
    * @brief Converts real-world metric coordinates (meters) to a cell index (x, y).
@@ -147,7 +147,7 @@ public:
    * @return Pair (x, y) cell indices.
    * @throw std::out_of_range if resulting indices are out of map bounds.
    */
-  std::pair<std::size_t, std::size_t> metric_to_cell(double mx, double my) const;
+  std::pair<int, int> metric_to_cell(double mx, double my) const;
 
   /**
    * @brief Updates a nav_msgs::msg::OccupancyGrid message from the SimpleMap contents.
@@ -194,15 +194,15 @@ public:
   void print(bool view_data = false) const;
 
 private:
-  std::size_t width_;
-  std::size_t height_;
+  int width_;
+  int height_;
   double resolution_;
   double origin_x_;
   double origin_y_;
   std::vector<uint8_t> data_;
 
-  std::size_t index(std::size_t x, std::size_t y) const;
-  void check_bounds(std::size_t x, std::size_t y) const;
+  int index(int x, int y) const;
+  void check_bounds(int x, int y) const;
 };
 
 }  // namespace easynav

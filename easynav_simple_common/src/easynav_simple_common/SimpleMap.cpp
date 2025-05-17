@@ -40,7 +40,7 @@ SimpleMap::SimpleMap()
 
 void
 SimpleMap::initialize(
-  std::size_t width, std::size_t height, double resolution,
+  int width, int height, double resolution,
   double origin_x, double origin_y, bool initial_value)
 {
   width_ = width;
@@ -52,7 +52,7 @@ SimpleMap::initialize(
 }
 
 uint8_t
-SimpleMap::at(std::size_t x, std::size_t y) const
+SimpleMap::at(int x, int y) const
 {
   check_bounds(x, y);
   return data_[index(x, y)];
@@ -60,7 +60,7 @@ SimpleMap::at(std::size_t x, std::size_t y) const
 
 
 uint8_t &
-SimpleMap::at(std::size_t x, std::size_t y)
+SimpleMap::at(int x, int y)
 {
   check_bounds(x, y);
   return data_.at(index(x, y));
@@ -93,28 +93,28 @@ SimpleMap::check_bounds_metric(double mx, double my) const
     return false;
   }
 
-  std::size_t x = static_cast<std::size_t>(relative_x / resolution_);
-  std::size_t y = static_cast<std::size_t>(relative_y / resolution_);
+  int x = static_cast<int>(relative_x / resolution_);
+  int y = static_cast<int>(relative_y / resolution_);
 
   return x < width_ && y < height_;
 }
 
 std::pair<double, double>
-SimpleMap::cell_to_metric(std::size_t x, std::size_t y) const
+SimpleMap::cell_to_metric(int x, int y) const
 {
   double mx = origin_x_ + (static_cast<double>(x) + 0.5) * resolution_;
   double my = origin_y_ + (static_cast<double>(y) + 0.5) * resolution_;
   return {mx, my};
 }
 
-std::pair<std::size_t, std::size_t>
+std::pair<int, int>
 SimpleMap::metric_to_cell(double mx, double my) const
 {
   double relative_x = mx - origin_x_;
   double relative_y = my - origin_y_;
 
-  std::size_t x = static_cast<std::size_t>(relative_x / resolution_);
-  std::size_t y = static_cast<std::size_t>(relative_y / resolution_);
+  int x = static_cast<int>(relative_x / resolution_);
+  int y = static_cast<int>(relative_y / resolution_);
 
   return {x, y};
 }
@@ -139,7 +139,7 @@ SimpleMap::to_occupancy_grid(nav_msgs::msg::OccupancyGrid & grid_msg) const
     grid_msg.data.resize(width_ * height_);
   }
 
-  for (std::size_t idx = 0; idx < data_.size(); ++idx) {
+  for (int idx = 0; idx < data_.size(); ++idx) {
     grid_msg.data[idx] = data_[idx] ? 100 : 0;
   }
 }
@@ -155,9 +155,9 @@ SimpleMap::from_occupancy_grid(const nav_msgs::msg::OccupancyGrid & grid_msg)
     grid_msg.info.origin.position.y,
     false);  // valor inicial: libre (false)
 
-  for (std::size_t y = 0; y < height_; ++y) {
-    for (std::size_t x = 0; x < width_; ++x) {
-      std::size_t idx = y * width_ + x;
+  for (int y = 0; y < height_; ++y) {
+    for (int x = 0; x < width_; ++x) {
+      int idx = y * width_ + x;
       int8_t val = grid_msg.data[idx];
       data_[idx] = (val >= 50);
     }
@@ -176,7 +176,7 @@ SimpleMap::save_to_file(const std::string & path) const
       << resolution_ << " "
       << origin_x_ << " " << origin_y_ << "\n";
 
-  for (std::size_t i = 0; i < data_.size(); ++i) {
+  for (int i = 0; i < data_.size(); ++i) {
     out << (data_[i] ? "1" : "0");
     if (i + 1 < data_.size()) {
       out << " ";
@@ -200,7 +200,7 @@ SimpleMap::load_from_file(const std::string & path)
 
   if (!std::getline(in, line)) {return false;}
   std::istringstream meta_stream(line);
-  std::size_t w, h;
+  int w, h;
   double res, ox, oy;
   if (!(meta_stream >> w >> h >> res >> ox >> oy)) {
     return false;
@@ -229,14 +229,14 @@ SimpleMap::load_from_file(const std::string & path)
   return true;
 }
 
-std::size_t
-SimpleMap::index(std::size_t x, std::size_t y) const
+int
+SimpleMap::index(int x, int y) const
 {
   return y * width_ + x;  // Row-major order
 }
 
 void
-SimpleMap::check_bounds(std::size_t x, std::size_t y) const
+SimpleMap::check_bounds(int x, int y) const
 {
   if (x >= width_ || y >= height_) {
     throw std::out_of_range("SimpleMap: index out of bounds");
@@ -259,8 +259,8 @@ SimpleMap::print(bool view_data) const
   if (!view_data) {return;}
 
   std::cerr << "SimpleMap Data:\n";
-  for (std::size_t y = 0; y < height_; ++y) {
-    for (std::size_t x = 0; x < width_; ++x) {
+  for (int y = 0; y < height_; ++y) {
+    for (int x = 0; x < width_; ++x) {
       double mx = origin_x_ + (x + 0.5) * resolution_;
       double my = origin_y_ + (y + 0.5) * resolution_;
       std::cerr << "[" << x << ", " << y << "][" << mx << ", " << my << "] "
