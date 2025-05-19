@@ -26,6 +26,8 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_package_prefix.hpp"
 
+#include "easynav_common/YTSession.hpp"
+
 namespace easynav
 {
 
@@ -34,9 +36,6 @@ using std::placeholders::_1;
 
 SimpleMapsManager::~SimpleMapsManager()
 {
-  if (session_ != nullptr) {
-    session_->stop();
-  }
 }
 
 
@@ -159,14 +158,15 @@ SimpleMapsManager::set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map)
 void
 SimpleMapsManager::update(const NavState & nav_state)
 {
-  TRACE_EVENT(*session_);
+  EASYNAV_TRACE_EVENT;
+
   dynamic_map_->deep_copy(*static_map_);
 
   auto fused = PerceptionsOpsView(nav_state.perceptions)
     .downsample(dynamic_map_->resolution())
     .fuse("map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
-    .as_points(0);
+    .as_points();
 
   for (const auto & p : fused) {
     if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
