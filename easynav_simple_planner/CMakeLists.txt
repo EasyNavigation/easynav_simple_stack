@@ -14,7 +14,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(easynav_common REQUIRED)
 find_package(easynav_simple_common REQUIRED)
-find_package(easynav_localizer REQUIRED)
+find_package(easynav_planner REQUIRED)
 find_package(easynav_core REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -26,7 +26,7 @@ set(dependencies
   easynav_common
   easynav_core
   easynav_simple_common
-  easynav_localizer
+  easynav_planner
   pluginlib
   geometry_msgs
   nav_msgs

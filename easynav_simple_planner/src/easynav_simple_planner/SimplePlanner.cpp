@@ -56,7 +56,9 @@ SimplePlanner::on_initialize()
   const auto & plugin_name = get_plugin_name();
 
   node->declare_parameter<double>(plugin_name + ".robot_radius", 0.3);
+  node->declare_parameter<double>(plugin_name + ".clearance_distance", 0.2);
   node->get_parameter<double>(plugin_name + ".robot_radius", robot_radius_);
+  node->get_parameter<double>(plugin_name + ".clearance_distance", clearance_distance_);
 
   path_pub_ = get_node()->create_publisher<nav_msgs::msg::Path>("planner/path", 10);
 
@@ -172,7 +174,7 @@ SimplePlanner::a_star_path(
   open.push({sx, sy, 0.0, heuristic(sx, sy, gx, gy)});
   cost_so_far[idx(sx, sy)] = 0.0;
 
-  double min_clearance = robot_radius_ / resolution;
+  double min_clearance = (robot_radius_ + clearance_distance_) / resolution;
 
   while (!open.empty()) {
     auto current = open.top();
@@ -217,6 +219,10 @@ SimplePlanner::a_star_path(
     std::tie(cx, cy) = came_from[idx(cx, cy)];
   }
   std::reverse(path.begin(), path.end());
+
+  if (path.empty()) {
+    path.push_back(goal);
+  }
 
   return path;
 }

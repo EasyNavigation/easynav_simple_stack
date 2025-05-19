@@ -61,6 +61,8 @@ public:
 
 protected:
   double robot_radius_;
+  double clearance_distance_;
+
   nav_msgs::msg::Path current_path_;
 
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
