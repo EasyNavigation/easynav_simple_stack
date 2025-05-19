@@ -175,6 +175,7 @@ AMCLLocalizer::on_initialize()
   node->declare_parameter<double>(plugin_name + ".initial_pose.yaw", 0.0);
   node->declare_parameter<double>(plugin_name + ".initial_pose.std_dev_xy", 0.5);
   node->declare_parameter<double>(plugin_name + ".initial_pose.std_dev_yaw", 0.5);
+  node->declare_parameter<double>(plugin_name + ".reseed_freq", 1.0);
 
   node->get_parameter<int>(plugin_name + ".num_particles", num_particles);
   node->get_parameter<double>(plugin_name + ".initial_pose.x", x_init);
@@ -182,6 +183,10 @@ AMCLLocalizer::on_initialize()
   node->get_parameter<double>(plugin_name + ".initial_pose.yaw", yaw_init);
   node->get_parameter<double>(plugin_name + ".initial_pose.std_dev_xy", std_dev_xy);
   node->get_parameter<double>(plugin_name + ".initial_pose.std_dev_yaw", std_dev_yaw);
+
+  double reseed_freq;
+  node->get_parameter<double>(plugin_name + ".reseed_freq", reseed_freq);
+  reseed_time_ = 1.0 / reseed_freq;
 
   RCLCPP_INFO(node->get_logger(), "Initialized AMCL pose with %d particles", num_particles);
   RCLCPP_INFO(node->get_logger(), "at position (%lf, %lf, %lf) std_dev [%lf, %lf]",
@@ -198,6 +203,8 @@ AMCLLocalizer::on_initialize()
     p.pose.setRotation(q);
     p.pose.setOrigin(tf2::Vector3(noise_x(rng_), noise_y(rng_), 0.0));
 
+    p.hits = 0;
+    p.possible_hits = 0;
     p.weight = 1.0 / num_particles;
   }
 
@@ -218,6 +225,9 @@ AMCLLocalizer::on_initialize()
     "amcl/pose", 10);
 
   last_reseed_ = get_node()->now();
+
+  get_node()->get_logger().set_level(rclcpp::Logger::Level::Debug);
+
   return {};
 }
 
@@ -239,6 +249,24 @@ void printTransform(const tf2::Transform & tf)
 }
 
 void
+AMCLLocalizer::update_rt(const NavState & nav_state)
+{
+  predict(nav_state);
+}
+
+void
+AMCLLocalizer::update(const NavState & nav_state)
+{
+  correct(nav_state);
+
+  if ((get_node()->now() - last_reseed_).seconds() > reseed_time_) {
+    reseed();
+    last_reseed_ = get_node()->now();
+  }
+  publishParticles();
+}
+
+void
 AMCLLocalizer::odom_callback(nav_msgs::msg::Odometry::UniquePtr msg)
 {
   tf2::fromMsg(msg->pose.pose, odom_);
@@ -250,27 +278,11 @@ AMCLLocalizer::odom_callback(nav_msgs::msg::Odometry::UniquePtr msg)
 }
 
 void
-AMCLLocalizer::update_rt(const NavState & nav_state)
-{
-  predict(nav_state);
-}
-
-void
-AMCLLocalizer::update(const NavState & nav_state)
-{
-  //correct(nav_state);
-
-  // if (get_node()->now() - last_reseed_ > 1s) {
-  //   reseed();
-  //   last_reseed_ = get_node()->now();
-  // }
-  publishParticles();
-}
-
-void
 AMCLLocalizer::predict(const NavState & nav_state)
 {
-  if (!initialized_odom_) {return;}
+  if (!initialized_odom_) {
+    return;
+  }
 
   tf2::Transform delta = last_odom_.inverseTimes(odom_);
 
@@ -281,7 +293,6 @@ AMCLLocalizer::predict(const NavState & nav_state)
   last_odom_ = odom_;
 
   tf2::Transform map2bf = getEstimatedPose();
-
   tf2::Transform map2odom = map2bf * odom_.inverse();
 
   publishTF(map2odom);
@@ -291,62 +302,78 @@ AMCLLocalizer::predict(const NavState & nav_state)
 void AMCLLocalizer::correct(const NavState & nav_state)
 {
   const auto & perceptions = nav_state.perceptions;
-  const auto map = std::dynamic_pointer_cast<SimpleMap>(nav_state.maps.at("simple.static"));
-  if (!map) {
+
+  std::shared_ptr<SimpleMap> map_typed;
+
+  try {
+    const auto map = nav_state.maps.at("simple.static");
+    map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
+  } catch (std::out_of_range & e) {
+    RCLCPP_WARN(get_node()->get_logger(), "There is no a imple.static map");
+    return;
+  }
+
+  if (!map_typed) {
     std::cerr << "Incorrect Map" << std::endl;
     return;
   }
 
   const auto & filtered = PerceptionsOpsView(perceptions)
-    .downsample(map->resolution())
-    .fuse("map")
+    .downsample(map_typed->resolution())
+    .fuse("base_footprint")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .collapse({NAN, NAN, 0.1})
-    ->downsample(map->resolution())
-    .as_points(0);
+    ->downsample(map_typed->resolution())
+    .as_points();
+
+  if (filtered.empty()) {
+    RCLCPP_WARN(get_node()->get_logger(), "No points to correct");
+    return;
+  }
 
   for (auto & particle : particles_) {
-    // std::cerr << particle.weight << " ---> ";
-
     int hits = 0;
-    int possible = 0;
+    int possible_hits = 0;
 
     for (const auto & pt : filtered) {
       tf2::Vector3 pt_world = particle.pose * tf2::Vector3(pt.x, pt.y, pt.z);
 
-      if (!map->check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
+      if (!map_typed->check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
 
       try {
-        auto [cell_x, cell_y] = map->metric_to_cell(pt_world.x(), pt_world.y());
-        if (map->at(cell_x, cell_y)) {
+        auto [cell_x, cell_y] = map_typed->metric_to_cell(pt_world.x(), pt_world.y());
+        ++possible_hits;
+        if (map_typed->at(cell_x, cell_y)) {
           ++hits;
         }
-        ++possible;
       } catch (const std::out_of_range & e) {
         continue;
       }
     }
 
-    if (possible > 0) {
-      particle.weight = particle.weight + static_cast<double>(hits) / static_cast<double>(possible);
-    }
-    // std::cerr << particle.weight << " hits = " << hits << " / " << possible << std::endl;
+    particle.hits += hits;
+    particle.possible_hits += possible_hits;
   }
 
-//   double total_weight = 0.0;
-//   for (const auto & p : particles_) {
-//     total_weight += p.weight;
-//   }
-//
-//   if (total_weight > 0.0) {
-//     for (auto & p : particles_) {
-//       p.weight /= total_weight;
-//       std::cerr << p.weight << " ";
-//     }
-//       std::cerr << std::endl;
-//
-//   }
+  for (auto & particle : particles_) {
+    if (particle.possible_hits > 0) {
+      particle.weight = static_cast<double>(particle.hits) /
+        static_cast<double>(particle.possible_hits);
+    } else {
+      particle.weight = 0;
+    }
+  }
 
+  double total_weight = 0.0;
+  for (const auto & p : particles_) {
+    total_weight += p.weight;
+  }
+
+  if (total_weight > 0.0) {
+    for (auto & p : particles_) {
+      p.weight /= total_weight;
+    }
+  }
 }
 
 void
@@ -356,14 +383,6 @@ AMCLLocalizer::reseed()
 
   const std::size_t N = particles_.size();
   const std::size_t N_top = N / 2;
-
-  double total_weight = 0.0;
-  for (const auto & p : particles_) {
-    total_weight += p.weight;
-  }
-  for (auto & p : particles_) {
-    p.weight /= total_weight;
-  }
 
   std::sort(particles_.begin(), particles_.end(),
     [](const Particle & a, const Particle & b) {
@@ -385,7 +404,7 @@ AMCLLocalizer::reseed()
   double yaw_stddev = std::sqrt(yaw_variance);
   std::normal_distribution<double> yaw_noise(0.0, yaw_stddev);
 
-  std::normal_distribution<double> index_dist(0.0, 0.1 * static_cast<double>(N));
+  std::normal_distribution<double> index_dist(0.0, 0.05 * static_cast<double>(N));
   std::normal_distribution<double> standard_normal(0.0, 1.0);
 
   for (std::size_t i = N_top; i < N; ++i) {
@@ -395,14 +414,14 @@ AMCLLocalizer::reseed()
     } while (selected_idx < 0 || static_cast<std::size_t>(selected_idx) >= N_top);
 
     const auto & ref_particle = particles_[selected_idx];
+
+
     tf2::Vector3 origin = ref_particle.pose.getOrigin();
 
     double z0 = standard_normal(rng_);
     double z1 = standard_normal(rng_);
     double dx = l00 * z0;
     double dy = l10 * z0 + l11 * z1;
-
-    // std::cerr << "[" << dx << ", " << dy << "]" << std::endl;
 
     tf2::Vector3 new_origin(origin.x() + dx, origin.y() + dy, 0.0);
 
@@ -418,7 +437,12 @@ AMCLLocalizer::reseed()
     particles_[i].weight = ref_particle.weight;
   }
 
-  total_weight = 0.0;
+  for (auto & particle : particles_) {
+    particle.hits = 0;
+    particle.possible_hits = 0;
+  }
+
+  double total_weight = 0.0;
   for (const auto & p : particles_) {
     total_weight += p.weight;
   }

@@ -52,6 +52,8 @@ namespace easynav
 struct Particle
 {
   tf2::Transform pose;
+  int hits;
+  int possible_hits;
   double weight;
 };
 
@@ -105,8 +107,13 @@ protected:
 
   std::vector<Particle> particles_;
   std::default_random_engine rng_;
-  tf2::Transform odom_, last_odom_;
+
+  tf2::Transform odom_{tf2::Transform::getIdentity()};
+  tf2::Transform last_odom_{tf2::Transform::getIdentity()};
   bool initialized_odom_ = false;
+
+  double reseed_time_;
+
   rclcpp::Time last_reseed_;
 };
 
