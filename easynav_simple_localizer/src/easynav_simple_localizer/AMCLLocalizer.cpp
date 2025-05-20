@@ -295,7 +295,7 @@ AMCLLocalizer::predict(const NavState & nav_state)
 
   tf2::Vector3 t = delta.getOrigin();
   double dx = t.x(), dy = t.y(), dz = t.z();
-  double trans_len = std::sqrt(dx*dx + dy*dy + dz*dz);
+  double trans_len = std::sqrt(dx * dx + dy * dy + dz * dz);
 
   double roll, pitch, yaw;
   tf2::Matrix3x3(delta.getRotation()).getRPY(roll, pitch, yaw);
