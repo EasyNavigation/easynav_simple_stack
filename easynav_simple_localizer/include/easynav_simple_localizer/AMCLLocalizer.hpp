@@ -108,6 +108,10 @@ protected:
   std::vector<Particle> particles_;
   std::default_random_engine rng_;
 
+  double noise_translation_ {0.01};
+  double noise_rotation_ {0.01};
+  double noise_translation_to_rotation_ {0.01};
+
   tf2::Transform odom_{tf2::Transform::getIdentity()};
   tf2::Transform last_odom_{tf2::Transform::getIdentity()};
   bool initialized_odom_ = false;
