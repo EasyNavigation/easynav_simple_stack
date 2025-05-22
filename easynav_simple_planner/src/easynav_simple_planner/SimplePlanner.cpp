@@ -79,23 +79,25 @@ SimplePlanner::update(const NavState & nav_state)
   const auto & map = dynamic_cast<const SimpleMap &>(*nav_state.maps.at("simple.dynamic"));
   const auto & goal = nav_state.goals.goals.front().pose;
 
+  auto downsampled_map = map.downsample(0.2);
+
   if (nav_state.goals.header.frame_id != "map") {
     RCLCPP_WARN(get_node()->get_logger(),
       "SimplePlanner::update goals frame is not map (%s)", nav_state.goals.header.frame_id.c_str());
     return;
   }
 
-  if (!map.check_bounds_metric(goal.position.x, goal.position.y)) {
+  if (!downsampled_map->check_bounds_metric(goal.position.x, goal.position.y)) {
     RCLCPP_WARN(get_node()->get_logger(),
       "SimplePlanner::update goal (%lf, %lf) outside the map", goal.position.x, goal.position.y);
     return;
   }
 
   auto poses = a_star_path(
-    map,
+    *downsampled_map,
     nav_state.odom.pose.pose,
     goal,
-    map.resolution());
+    downsampled_map->resolution());
 
   if (!poses.empty()) {
     current_path_.header.stamp = get_node()->now();
