@@ -176,6 +176,9 @@ AMCLLocalizer::on_initialize()
   node->declare_parameter<double>(plugin_name + ".initial_pose.std_dev_xy", 0.5);
   node->declare_parameter<double>(plugin_name + ".initial_pose.std_dev_yaw", 0.5);
   node->declare_parameter<double>(plugin_name + ".reseed_freq", 1.0);
+  node->declare_parameter<double>(plugin_name + ".noise_translation", 0.01);
+  node->declare_parameter<double>(plugin_name + ".noise_rotation", 0.01);
+  node->declare_parameter<double>(plugin_name + ".noise_translation_to_rotation", 0.01);
 
   node->get_parameter<int>(plugin_name + ".num_particles", num_particles);
   node->get_parameter<double>(plugin_name + ".initial_pose.x", x_init);
@@ -183,6 +186,10 @@ AMCLLocalizer::on_initialize()
   node->get_parameter<double>(plugin_name + ".initial_pose.yaw", yaw_init);
   node->get_parameter<double>(plugin_name + ".initial_pose.std_dev_xy", std_dev_xy);
   node->get_parameter<double>(plugin_name + ".initial_pose.std_dev_yaw", std_dev_yaw);
+  node->get_parameter<double>(plugin_name + ".noise_translation", noise_translation_);
+  node->get_parameter<double>(plugin_name + ".noise_rotation", noise_rotation_);
+  node->get_parameter<double>(plugin_name + ".noise_translation_to_rotation",
+    noise_translation_to_rotation_);
 
   double reseed_freq;
   node->get_parameter<double>(plugin_name + ".reseed_freq", reseed_freq);
@@ -286,8 +293,38 @@ AMCLLocalizer::predict(const NavState & nav_state)
 
   tf2::Transform delta = last_odom_.inverseTimes(odom_);
 
+  tf2::Vector3 t = delta.getOrigin();
+  double dx = t.x(), dy = t.y(), dz = t.z();
+  double trans_len = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+  double roll, pitch, yaw;
+  tf2::Matrix3x3(delta.getRotation()).getRPY(roll, pitch, yaw);
+  double rot_len = std::abs(yaw);
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
   for (auto & p : particles_) {
-    p.pose = p.pose * delta;
+    std::normal_distribution<double> noise_dx(0.0, std::abs(dx) * noise_translation_);
+    std::normal_distribution<double> noise_dy(0.0, std::abs(dy) * noise_translation_);
+    std::normal_distribution<double> noise_dz(0.0, std::abs(dz) * noise_translation_);
+
+    std::normal_distribution<double> noise_yaw(
+      0.0,
+      rot_len * noise_rotation_ + trans_len * noise_translation_to_rotation_);
+
+    tf2::Vector3 noisy_translation(
+      dx + noise_dx(gen),
+      dy + noise_dy(gen),
+      dz + noise_dz(gen));
+
+    double noisy_yaw = yaw + noise_yaw(gen);
+    tf2::Quaternion noisy_q;
+    noisy_q.setRPY(0.0, 0.0, noisy_yaw);
+
+    tf2::Transform noisy_delta(noisy_q, noisy_translation);
+
+    p.pose = p.pose * noisy_delta;
   }
 
   last_odom_ = odom_;
