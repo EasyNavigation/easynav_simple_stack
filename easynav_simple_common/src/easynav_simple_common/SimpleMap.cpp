@@ -269,5 +269,54 @@ SimpleMap::print(bool view_data) const
   }
 }
 
+std::shared_ptr<SimpleMap>
+SimpleMap::downsample_factor(int factor) const
+{
+  if (factor <= 1) {
+    throw std::invalid_argument("Downsampling factor must be > 1");
+  }
+
+  int new_width = width_ / factor;
+  int new_height = height_ / factor;
+  double new_resolution = resolution_ * factor;
+
+  auto new_map = std::make_shared<SimpleMap>();
+  new_map->initialize(new_width, new_height, new_resolution, origin_x_, origin_y_, false);
+
+  for (int y = 0; y < new_height; ++y) {
+    for (int x = 0; x < new_width; ++x) {
+      int occupied_count = 0;
+      for (int dy = 0; dy < factor; ++dy) {
+        for (int dx = 0; dx < factor; ++dx) {
+          int src_x = x * factor + dx;
+          int src_y = y * factor + dy;
+          if (at(src_x, src_y)) {
+            occupied_count++;
+          }
+        }
+      }
+
+      new_map->at(x, y) = (occupied_count > (factor * factor / 2));
+    }
+  }
+
+  return new_map;
+}
+
+std::shared_ptr<SimpleMap>
+SimpleMap::downsample(double new_resolution) const
+{
+  if (new_resolution <= resolution_) {
+    throw std::invalid_argument("new_resolution must be greater than current resolution");
+  }
+
+  int factor = static_cast<int>(std::floor(new_resolution / resolution_));
+
+  if (factor < 1) {
+    factor = 1;
+  }
+
+  return downsample_factor(factor);
+}
 
 }  // namespace easynav
