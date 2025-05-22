@@ -193,6 +193,22 @@ public:
    */
   void print(bool view_data = false) const;
 
+  /**
+   * @brief Creates a downsampled version of the map by an integer factor.
+   *
+   * @param factor Integer factor (>1) to reduce resolution.
+   * @return A shared pointer to the new downsampled SimpleMap.
+   */
+  std::shared_ptr<SimpleMap> downsample_factor(int factor) const;
+
+  /**
+   * @brief Creates a downsampled version of the map to match a target resolution.
+   *
+   * @param new_resolution New desired resolution (must be a multiple of current).
+   * @return A shared pointer to the new downsampled SimpleMap.
+   */
+  std::shared_ptr<SimpleMap> downsample(double new_resolution) const;
+
 private:
   int width_;
   int height_;

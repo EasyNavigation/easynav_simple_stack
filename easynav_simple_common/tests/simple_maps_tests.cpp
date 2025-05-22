@@ -138,3 +138,68 @@ TEST_F(SimpleMapTest, OccupancyGridConversion)
     }
   }
 }
+
+/// \brief Downsampling with integer factor
+TEST_F(SimpleMapTest, DownsampleIntegerFactor)
+{
+  easynav::SimpleMap map;
+  map.initialize(4, 4, 0.5, 0.0, 0.0);
+
+  map.at(0, 0) = true;
+  map.at(1, 0) = true;
+  map.at(1, 1) = true;
+  map.at(2, 2) = true;
+
+  auto downsampled = map.downsample_factor(2);
+  ASSERT_NE(downsampled, nullptr);
+
+  EXPECT_EQ(downsampled->width(), 2u);
+  EXPECT_EQ(downsampled->height(), 2u);
+  EXPECT_DOUBLE_EQ(downsampled->resolution(), 1.0);
+  EXPECT_DOUBLE_EQ(downsampled->origin_x(), 0.0);
+  EXPECT_DOUBLE_EQ(downsampled->origin_y(), 0.0);
+
+  EXPECT_TRUE(downsampled->at(0, 0));
+  EXPECT_FALSE(downsampled->at(1, 0));
+  EXPECT_FALSE(downsampled->at(0, 1));
+  EXPECT_FALSE(downsampled->at(1, 1));
+}
+
+/// \brief Downsampling to new resolution
+TEST_F(SimpleMapTest, DownsampleToResolution)
+{
+  easynav::SimpleMap map;
+  map.initialize(6, 6, 0.2, -1.0, -1.0);
+
+  map.at(1, 1) = true;
+  map.at(2, 2) = true;
+  map.at(4, 4) = true;
+  map.at(5, 5) = true;
+
+  auto downsampled = map.downsample(0.4);
+  ASSERT_NE(downsampled, nullptr);
+
+  EXPECT_EQ(downsampled->width(), 3u);
+  EXPECT_EQ(downsampled->height(), 3u);
+  EXPECT_DOUBLE_EQ(downsampled->resolution(), 0.4);
+  EXPECT_DOUBLE_EQ(downsampled->origin_x(), -1.0);
+  EXPECT_DOUBLE_EQ(downsampled->origin_y(), -1.0);
+
+  EXPECT_FALSE(downsampled->at(0, 0));
+  EXPECT_FALSE(downsampled->at(1, 1));
+  EXPECT_FALSE(downsampled->at(2, 2));
+}
+
+/// \brief Downsample that results in cropped edges
+TEST_F(SimpleMapTest, DownsampleWithCropping)
+{
+  easynav::SimpleMap map;
+  map.initialize(7, 7, 0.2, 0.0, 0.0);
+
+  map.at(6, 6) = true;
+
+  auto downsampled = map.downsample(0.7);
+
+  EXPECT_EQ(downsampled->width(), 2u);
+  EXPECT_EQ(downsampled->height(), 2u);
+}
