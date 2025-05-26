@@ -40,7 +40,7 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/transform_broadcaster.h"
-#include "tf2/LinearMath/Vector3.h"
+#include "tf2/LinearMath/Vector3.hpp"
 
 #include "easynav_core/LocalizerMethodBase.hpp"
 #include "easynav_common/types/MapTypeBase.hpp"
