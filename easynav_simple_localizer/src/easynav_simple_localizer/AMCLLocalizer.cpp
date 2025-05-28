@@ -286,7 +286,7 @@ AMCLLocalizer::odom_callback(nav_msgs::msg::Odometry::UniquePtr msg)
 }
 
 void
-AMCLLocalizer::predict(const NavState & nav_state)
+AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
 {
   if (!initialized_odom_) {
     return;

@@ -13,7 +13,6 @@ find_package(ament_cmake REQUIRED)
 find_package(easynav_common REQUIRED)
 # find_package(pluginlib REQUIRED)
 find_package(nav_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
 
 
 add_library(${PROJECT_NAME} SHARED
@@ -27,7 +26,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   easynav_common::easynav_common
   # pluginlib::pluginlib
   ${nav_msgs_TARGETS}
-  ${geometry_msgs_TARGETS}
 )
 
 install(
@@ -60,6 +58,5 @@ ament_export_dependencies(
   easynav_common
   # pluginlib
   nav_msgs
-  geometry_msgs
 )
 ament_package()
