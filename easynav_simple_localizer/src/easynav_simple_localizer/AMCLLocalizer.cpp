@@ -24,12 +24,13 @@
 #include <random>
 
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
-#include "tf2/convert.hpp"
+#include "tf2/LinearMath/Vector3.hpp"
 
 #include "easynav_common/RTTFBuffer.hpp"
 
 #include "easynav_simple_localizer/AMCLLocalizer.hpp"
 #include "easynav_localizer/LocalizerNode.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 namespace easynav
 {
