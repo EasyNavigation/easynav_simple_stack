@@ -10,37 +10,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
 find_package(easynav_common REQUIRED)
-find_package(easynav_core REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(ament_index_cpp REQUIRED)
+# find_package(pluginlib REQUIRED)
+find_package(nav_msgs REQUIRED)
 
-set(dependencies
-  rclcpp
-  rclcpp_lifecycle
-  easynav_common
-  easynav_core
-  pluginlib
-  nav_msgs
-  geometry_msgs
-  ament_index_cpp
-)
-
-include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
   src/easynav_simple_common/SimpleMap.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  easynav_common::easynav_common
+  # pluginlib::pluginlib
+  ${nav_msgs_TARGETS}
+)
 
-install(DIRECTORY include/
-  DESTINATION include/
+install(
+  DIRECTORY include/
+  DESTINATION include/${PROJECT_NAME}
 )
 
 install(TARGETS
@@ -61,10 +51,12 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
-ament_export_include_directories(include)
+ament_export_include_directories("include/${PROJECT_NAME}")
 ament_export_libraries(${PROJECT_NAME})
-ament_export_targets(
-  export_${PROJECT_NAME}
+ament_export_targets(export_${PROJECT_NAME})
+ament_export_dependencies(
+  easynav_common
+  # pluginlib
+  nav_msgs
 )
-ament_export_dependencies(${dependencies})
 ament_package()

@@ -34,17 +34,12 @@
 
 #include "geometry_msgs/msg/pose_array.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
-#include "std_srvs/srv/trigger.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 
-#include "tf2_ros/buffer.h"
-#include "tf2_ros/transform_listener.h"
+#include "tf2/LinearMath/Transform.hpp"
 #include "tf2_ros/transform_broadcaster.h"
-#include "tf2/LinearMath/Vector3.h"
 
 #include "easynav_core/LocalizerMethodBase.hpp"
-#include "easynav_common/types/MapTypeBase.hpp"
-#include "easynav_simple_common/SimpleMap.hpp"
 
 namespace easynav
 {

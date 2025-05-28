@@ -21,13 +21,8 @@
 /// \brief Implementation of the SimpleController class.
 
 #include <expected>
-#include <random>
 
-#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
-#include "tf2/convert.hpp"
 #include "tf2/utils.hpp"
-
-#include "easynav_common/RTTFBuffer.hpp"
 
 #include "easynav_simple_controller/SimpleController.hpp"
 

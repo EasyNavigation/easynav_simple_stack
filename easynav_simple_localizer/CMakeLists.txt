@@ -10,47 +10,41 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
 find_package(easynav_common REQUIRED)
 find_package(easynav_simple_common REQUIRED)
 find_package(easynav_localizer REQUIRED)
 find_package(easynav_core REQUIRED)
 find_package(pluginlib REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(std_srvs REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(nav_msgs REQUIRED)
 
-set(dependencies
-  rclcpp
-  rclcpp_lifecycle
-  easynav_common
-  easynav_simple_common
-  easynav_localizer
-  easynav_core
-  pluginlib
-  geometry_msgs
-  std_srvs
-  tf2_ros
-  tf2_geometry_msgs
-  nav_msgs
-)
-
-include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
   src/easynav_simple_localizer/AMCLLocalizer.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  easynav_common::easynav_common
+  easynav_simple_common::easynav_simple_common
+  easynav_localizer::easynav_localizer
+  tf2::tf2
+  tf2_ros::tf2_ros
+  pluginlib::pluginlib
+  ${tf2_geometry_msgs_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${nav_msgs_TARGETS}
+)
 
-install(DIRECTORY include/
-  DESTINATION include/
+install(
+  DIRECTORY include/
+  DESTINATION include/${PROJECT_NAME}
 )
 
 install(TARGETS
@@ -71,12 +65,23 @@ if(BUILD_TESTING)
   # add_subdirectory(tests)
 endif()
 
-ament_export_include_directories(include)
+ament_export_include_directories("include/${PROJECT_NAME}")
 ament_export_libraries(${PROJECT_NAME})
-ament_export_targets(
-  export_${PROJECT_NAME}
-)
+ament_export_targets(export_${PROJECT_NAME})
+
 # Register the planning plugins
 pluginlib_export_plugin_description_file(easynav_core easynav_simple_localizer_plugins.xml)
-ament_export_dependencies(${dependencies})
+
+ament_export_dependencies(
+  easynav_common
+  easynav_simple_common
+  easynav_localizer
+  easynav_core
+  tf2
+  tf2_ros
+  pluginlib
+  geometry_msgs
+  std_srvs
+  nav_msgs
+)
 ament_package()

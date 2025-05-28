@@ -6,9 +6,6 @@
 
 #include "easynav_simple_common/SimpleMap.hpp"
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
-
 #include <memory>
 
 /// \brief Fixture for SimpleMap tests (minimal)

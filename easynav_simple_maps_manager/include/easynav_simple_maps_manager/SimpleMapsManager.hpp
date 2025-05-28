@@ -31,7 +31,6 @@
 #include <sstream>
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
-#include "geometry_msgs/msg/pose.hpp"
 #include "std_srvs/srv/trigger.hpp"
 
 #include "tf2_ros/buffer.h"

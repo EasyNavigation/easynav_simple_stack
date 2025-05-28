@@ -15,7 +15,6 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "nav_msgs/msg/path.hpp"
-#include "rclcpp/rclcpp.hpp"
 
 #include "easynav_core/ControllerMethodBase.hpp"
 #include "easynav_common/types/NavState.hpp"

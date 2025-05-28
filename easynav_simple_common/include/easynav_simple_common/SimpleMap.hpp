@@ -31,7 +31,6 @@
 #include <sstream>
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
-#include "geometry_msgs/msg/pose.hpp"
 
 #include "easynav_common/types/MapTypeBase.hpp"
 
@@ -71,12 +70,12 @@ public:
   /**
    * @brief Returns the width (number of columns) of the map.
    */
-  int width() const {return width_;}
+  size_t width() const {return width_;}
 
   /**
    * @brief Returns the height (number of rows) of the map.
    */
-  int height() const {return height_;}
+  size_t height() const {return height_;}
 
   /**
    * @brief Returns the resolution (cell size in meters).
@@ -210,15 +209,15 @@ public:
   std::shared_ptr<SimpleMap> downsample(double new_resolution) const;
 
 private:
-  int width_;
-  int height_;
+  size_t width_;
+  size_t height_;
   double resolution_;
   double origin_x_;
   double origin_y_;
   std::vector<uint8_t> data_;
 
   int index(int x, int y) const;
-  void check_bounds(int x, int y) const;
+  void check_bounds(size_t x, size_t y) const;
 };
 
 }  // namespace easynav

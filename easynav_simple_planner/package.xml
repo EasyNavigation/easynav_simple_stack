@@ -9,14 +9,10 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>rclcpp_lifecycle</depend>
   <depend>easynav_common</depend>
   <depend>easynav_core</depend>
   <depend>easynav_simple_common</depend>
-  <depend>easynav_planner</depend>
   <depend>pluginlib</depend>
-  <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
