@@ -54,6 +54,7 @@ protected:
   double max_angular_acc_{0.3};    ///< Maximum angular acceleration in rad/s².
   double look_ahead_dist_{1.0};    ///< Distance ahead of the robot to track in meters.
   double tolerance_dist_{0.05};    ///< Distance threshold to switch to orientation tracking.
+  double k_rot_{0.5};
 
   double last_vlin_{0.0};          ///< Previous linear velocity for acceleration limiting.
   double last_vrot_{0.0};          ///< Previous angular velocity for acceleration limiting.

@@ -48,6 +48,7 @@ SimpleController::on_initialize()
   node->declare_parameter<double>(plugin_name + ".max_angular_acc", max_angular_acc_);
   node->declare_parameter<double>(plugin_name + ".look_ahead_dist", look_ahead_dist_);
   node->declare_parameter<double>(plugin_name + ".tolerance_dist", tolerance_dist_);
+  node->declare_parameter<double>(plugin_name + ".k_rot", k_rot_);
 
   node->get_parameter<double>(plugin_name + ".max_linear_speed", max_linear_speed_);
   node->get_parameter<double>(plugin_name + ".max_angular_speed", max_angular_speed_);
@@ -55,6 +56,7 @@ SimpleController::on_initialize()
   node->get_parameter<double>(plugin_name + ".max_angular_acc", max_angular_acc_);
   node->get_parameter<double>(plugin_name + ".look_ahead_dist", look_ahead_dist_);
   node->get_parameter<double>(plugin_name + ".tolerance_dist", tolerance_dist_);
+  node->get_parameter<double>(plugin_name + ".k_rot", k_rot_);
 
   linear_pid_ = std::make_shared<PIDController>(0.01, look_ahead_dist_, 0.1, max_linear_speed_);
   angular_pid_ = std::make_shared<PIDController>(0.01, M_PI, 0.1, max_angular_speed_);
@@ -102,7 +104,7 @@ SimpleController::update_rt(const NavState & nav_state)
     vrot = angular_pid_->get_output(diff_angle);
   } else {
     vrot = angular_pid_->get_output(angle);
-    vlin = std::max(0.0, linear_pid_->get_output(dist) - abs(vrot));
+    vlin = std::max(0.0, linear_pid_->get_output(dist) - k_rot_ * abs(vrot));
   }
 
 
