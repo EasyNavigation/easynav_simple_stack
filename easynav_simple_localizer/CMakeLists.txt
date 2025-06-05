@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   tf2::tf2
   tf2_ros::tf2_ros
   pluginlib::pluginlib
-  ${tf2_geometry_msgs_TARGETS}
+  tf2_geometry_msgs::tf2_geometry_msgs
   ${geometry_msgs_TARGETS}
   ${nav_msgs_TARGETS}
 )

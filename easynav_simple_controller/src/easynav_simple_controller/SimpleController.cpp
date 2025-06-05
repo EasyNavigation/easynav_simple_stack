@@ -23,6 +23,7 @@
 #include <expected>
 
 #include "tf2/utils.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
 #include "easynav_simple_controller/SimpleController.hpp"
 
