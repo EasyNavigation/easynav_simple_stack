@@ -70,20 +70,33 @@ SimplePlanner::update(const NavState & nav_state)
 {
   current_path_.poses.clear();
 
-  if (nav_state.goals.goals.empty()) {return;}
-  if (!nav_state.maps.contains("simple.dynamic")) {
+  const auto & goals = nav_state.get_ref<nav_msgs::msg::Goals>("goals");
+
+  if (goals.goals.empty()) {return;}
+  if (!nav_state.has("simple.dynamic")) {
     RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update simple.dynamic map not found");
     return;
   }
 
-  const auto & map = dynamic_cast<const SimpleMap &>(*nav_state.maps.at("simple.dynamic"));
-  const auto & goal = nav_state.goals.goals.front().pose;
+  std::shared_ptr<SimpleMap> map_typed;
 
-  auto downsampled_map = map.downsample(0.2);
+  try {
+    const auto & map = nav_state.get_ref<std::shared_ptr<MapsTypeBase>>("simple.dynamic");
 
-  if (nav_state.goals.header.frame_id != "map") {
+    map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
+  } catch (std::out_of_range & e) {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a simple.dynamic map");
+    return;
+  }
+
+  const auto & odom = nav_state.get_ref<nav_msgs::msg::Odometry>("odom");
+  const auto & goal = goals.goals.front().pose;
+
+  auto downsampled_map = map_typed->downsample(0.2);
+
+  if (goals.header.frame_id != "map") {
     RCLCPP_WARN(get_node()->get_logger(),
-      "SimplePlanner::update goals frame is not map (%s)", nav_state.goals.header.frame_id.c_str());
+      "SimplePlanner::update goals frame is not map (%s)", goals.header.frame_id.c_str());
     return;
   }
 
@@ -95,17 +108,17 @@ SimplePlanner::update(const NavState & nav_state)
 
   auto poses = a_star_path(
     *downsampled_map,
-    nav_state.odom.pose.pose,
+    odom.pose.pose,
     goal,
     downsampled_map->resolution());
 
   if (!poses.empty()) {
     current_path_.header.stamp = get_node()->now();
-    current_path_.header.frame_id = nav_state.goals.header.frame_id;
+    current_path_.header.frame_id = goals.header.frame_id;
 
     for (const auto & pose : poses) {
       geometry_msgs::msg::PoseStamped pose_stamped;
-      pose_stamped.header.frame_id = nav_state.goals.header.frame_id;
+      pose_stamped.header.frame_id = goals.header.frame_id;
       pose_stamped.header.stamp = get_node()->now();
       pose_stamped.pose = pose;
       current_path_.poses.push_back(pose_stamped);

@@ -162,7 +162,7 @@ SimpleMapsManager::update(const NavState & nav_state)
 
   dynamic_map_->deep_copy(*static_map_);
 
-  auto fused = PerceptionsOpsView(nav_state.perceptions)
+  auto fused = PerceptionsOpsView(nav_state.get_ref<Perceptions>("perceptions"))
     .downsample(dynamic_map_->resolution())
     .fuse("map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
