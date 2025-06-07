@@ -339,15 +339,16 @@ AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
 
 void AMCLLocalizer::correct(const NavState & nav_state)
 {
-  const auto & perceptions = nav_state.perceptions;
+  const auto & perceptions = nav_state.get_ref<Perceptions>("perceptions");
 
   std::shared_ptr<SimpleMap> map_typed;
 
   try {
-    const auto map = nav_state.maps.at("simple.static");
+    const auto & map = nav_state.get_ref<std::shared_ptr<MapsTypeBase>>("simple.static");
+
     map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
   } catch (std::out_of_range & e) {
-    RCLCPP_WARN(get_node()->get_logger(), "There is no a imple.static map");
+    RCLCPP_WARN(get_node()->get_logger(), "There is no a simple.static map");
     return;
   }
 

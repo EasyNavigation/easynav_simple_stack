@@ -162,18 +162,18 @@ SimpleMapsManager::update(const NavState & nav_state)
 
   dynamic_map_->deep_copy(*static_map_);
 
-  auto fused = PerceptionsOpsView(nav_state.perceptions)
-    .downsample(dynamic_map_->resolution())
-    .fuse("map")
-    ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
-    .as_points();
-
-  for (const auto & p : fused) {
-    if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
-      auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-      dynamic_map_->at(cx, cy) = 1;
-    }
-  }
+//  auto fused = PerceptionsOpsView(nav_state.get_ref<Perceptions>("perceptions"))
+//    .downsample(dynamic_map_->resolution())
+//    .fuse("map")
+//    ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
+//    .as_points();
+//
+//  for (const auto & p : fused) {
+//    if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
+//      auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
+//      dynamic_map_->at(cx, cy) = 1;
+//    }
+//  }
 
   dynamic_map_->to_occupancy_grid(dynamic_grid_msg_);
   dynamic_grid_msg_.header.frame_id = "map";

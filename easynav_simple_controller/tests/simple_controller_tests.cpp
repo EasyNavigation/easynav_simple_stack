@@ -83,7 +83,9 @@ TEST_F(AMCLLocalizerTest, BasicDynamicUpdate)
   perception->stamp = rclcpp::Time(0);
   perception->frame_id = "map";
   perception->valid = true;
-  navstate.perceptions.push_back(perception);
+
+  navstate.set("perceptions", Perceptions());
+  navstate.get_mutable<Perceptions>("perceptions")->push_back(perception);
 
   manager->update(navstate);
 

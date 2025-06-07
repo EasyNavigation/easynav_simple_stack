@@ -87,7 +87,9 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->stamp = rclcpp::Time(0);
   perception->frame_id = "map";
   perception->valid = true;
-  navstate.perceptions.push_back(perception);
+
+  navstate.set("perceptions", easynav::Perceptions());
+  navstate.get_mutable<easynav::Perceptions>("perceptions").push_back(perception);
 
   manager->update(navstate);
 

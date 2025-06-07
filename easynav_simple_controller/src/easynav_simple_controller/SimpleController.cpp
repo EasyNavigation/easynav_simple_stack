@@ -75,7 +75,7 @@ SimpleController::update_rt(const NavState & nav_state)
   double dt = (get_node()->now() - last_update_ts_).seconds();
   last_update_ts_ = get_node()->now();
 
-  const auto & path = nav_state.path;
+  const auto & path = nav_state.get_ref<nav_msgs::msg::Path>("path");
 
   if (path.poses.empty()) {
     twist_stamped_.header.frame_id = path.header.frame_id;
@@ -86,7 +86,7 @@ SimpleController::update_rt(const NavState & nav_state)
   }
 
   auto ref_pose = get_ref_pose(path, look_ahead_dist_);
-  const auto & pose = nav_state.odom.pose.pose;
+  const auto & pose = nav_state.get_ref<nav_msgs::msg::Odometry>("odom").pose.pose;
 
   double dist = get_distance(pose, ref_pose);
 
