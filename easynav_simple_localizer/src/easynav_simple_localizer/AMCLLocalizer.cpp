@@ -418,6 +418,7 @@ void
 AMCLLocalizer::reseed()
 {
   if (particles_.empty()) {return;}
+  if (particles_[0].possible_hits == 0) {return;}
 
   const std::size_t N = particles_.size();
   const std::size_t N_top = N / 2;
