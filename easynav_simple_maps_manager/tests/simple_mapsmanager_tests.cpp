@@ -87,7 +87,10 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->stamp = rclcpp::Time(0);
   perception->frame_id = "map";
   perception->valid = true;
-  navstate.perceptions.push_back(perception);
+
+  easynav::PerceptionPtr p;
+  p.perception = std::make_shared<std::atomic<std::shared_ptr<easynav::Perception>>>(perception);
+  navstate.perceptions.push_back(p);
 
   manager->update(navstate);
 
