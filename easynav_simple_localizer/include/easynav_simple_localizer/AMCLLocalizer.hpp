@@ -75,12 +75,12 @@ public:
    */
   virtual std::expected<void, std::string> on_initialize() override;
 
-  void update_rt(const NavState & nav_state) override;
-  void update(const NavState & nav_state) override;
+  void update_rt(NavState & nav_state) override;
+  void update(NavState & nav_state) override;
 
 
   tf2::Transform getEstimatedPose() const;
-  nav_msgs::msg::Odometry get_odom() override;
+  nav_msgs::msg::Odometry get_pose();
 
 protected:
   void initializeParticles();
@@ -88,8 +88,8 @@ protected:
   void publishParticles();
   void publishEstimatedPose(const tf2::Transform & est_pose);
 
-  void predict(const NavState & nav_state);
-  void correct(const NavState & nav_state);
+  void predict(NavState & nav_state);
+  void correct(NavState & nav_state);
   void reseed();
 
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;

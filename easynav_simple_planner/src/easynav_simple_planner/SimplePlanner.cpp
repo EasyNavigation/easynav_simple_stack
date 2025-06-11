@@ -66,7 +66,7 @@ SimplePlanner::on_initialize()
 }
 
 void
-SimplePlanner::update(const NavState & nav_state)
+SimplePlanner::update(NavState & nav_state)
 {
   current_path_.poses.clear();
 
@@ -79,17 +79,14 @@ SimplePlanner::update(const NavState & nav_state)
   }
 
   std::shared_ptr<SimpleMap> map_typed;
-
-  try {
-    const auto & map = nav_state.get_ref<std::shared_ptr<MapsTypeBase>>("simple.dynamic");
-
-    map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
-  } catch (std::out_of_range & e) {
-    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a simple.dynamic map");
+  if (nav_state.has("map.dynamic")) {
+    map_typed = nav_state.get<std::shared_ptr<SimpleMap>>("map.dynamic");
+  } else {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.dynamic map");
     return;
   }
 
-  const auto & odom = nav_state.get_ref<nav_msgs::msg::Odometry>("odom");
+  const auto & robot_pose = nav_state.get_ref<nav_msgs::msg::Odometry>("robot_pose");
   const auto & goal = goals.goals.front().pose;
 
   auto downsampled_map = map_typed->downsample(0.2);
@@ -108,7 +105,7 @@ SimplePlanner::update(const NavState & nav_state)
 
   auto poses = a_star_path(
     *downsampled_map,
-    odom.pose.pose,
+    robot_pose.pose.pose,
     goal,
     downsampled_map->resolution());
 
@@ -128,13 +125,10 @@ SimplePlanner::update(const NavState & nav_state)
       path_pub_->publish(current_path_);
     }
   }
+
+  nav_state.set("path", current_path_);
 }
 
-nav_msgs::msg::Path
-SimplePlanner::get_path()
-{
-  return current_path_;
-}
 
 bool
 SimplePlanner::isFreeWithClearance(

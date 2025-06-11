@@ -70,7 +70,7 @@ SimpleController::on_initialize()
 
 
 void
-SimpleController::update_rt(const NavState & nav_state)
+SimpleController::update_rt(NavState & nav_state)
 {
   double dt = (get_node()->now() - last_update_ts_).seconds();
   last_update_ts_ = get_node()->now();
@@ -86,7 +86,7 @@ SimpleController::update_rt(const NavState & nav_state)
   }
 
   auto ref_pose = get_ref_pose(path, look_ahead_dist_);
-  const auto & pose = nav_state.get_ref<nav_msgs::msg::Odometry>("odom").pose.pose;
+  const auto & pose = nav_state.get_ref<nav_msgs::msg::Odometry>("robot_pose").pose.pose;
 
   double dist = get_distance(pose, ref_pose);
 
@@ -123,14 +123,10 @@ SimpleController::update_rt(const NavState & nav_state)
   twist_stamped_.header.stamp = get_node()->now();
   twist_stamped_.twist.linear.x = vlin;
   twist_stamped_.twist.angular.z = vrot;
+
+  nav_state.set("cmd_vel", twist_stamped_);
 }
 
-
-geometry_msgs::msg::TwistStamped
-SimpleController::get_cmd_vel()
-{
-  return twist_stamped_;
-}
 
 geometry_msgs::msg::Pose
 SimpleController::get_ref_pose(const nav_msgs::msg::Path & path, double look_ahead)

@@ -121,46 +121,30 @@ SimpleMapsManager::on_initialize()
   return {};
 }
 
-std::map<std::string, std::shared_ptr<MapsTypeBase>>
-SimpleMapsManager::get_maps()
+void
+SimpleMapsManager::set_static_map(std::shared_ptr<SimpleMap> new_map)
 {
-  std::map<std::string, std::shared_ptr<MapsTypeBase>> ret;
-  ret["simple.static"] = static_map_;
-  ret["simple.dynamic"] = dynamic_map_;
-
-  return ret;
+  static_map_ = new_map;
 }
 
 void
-SimpleMapsManager::set_static_map(std::shared_ptr<MapsTypeBase> new_map)
+SimpleMapsManager::set_dynamic_map(std::shared_ptr<SimpleMap> new_map)
 {
-  auto typed_ptr = std::dynamic_pointer_cast<SimpleMap>(new_map);
-  if (!typed_ptr) {
-    RCLCPP_WARN(get_node()->get_logger(),
-      "SimpleMapsManager::set_static_map: pointer is not a SimpleMap");
-  } else {
-    static_map_ = typed_ptr;
-  }
+  dynamic_map_ = new_map;
 }
 
 void
-SimpleMapsManager::set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map)
-{
-  auto typed_ptr = std::dynamic_pointer_cast<SimpleMap>(new_map);
-  if (!typed_ptr) {
-    RCLCPP_WARN(get_node()->get_logger(),
-      "SimpleMapsManager::set_dynamic_map: pointer is not a SimpleMap");
-  } else {
-    dynamic_map_ = typed_ptr;
-  }
-}
-
-void
-SimpleMapsManager::update(const NavState & nav_state)
+SimpleMapsManager::update(NavState & nav_state)
 {
   EASYNAV_TRACE_EVENT;
 
   dynamic_map_->deep_copy(*static_map_);
+
+  if (!nav_state.has("perceptions")) {
+    nav_state.set("map.static", static_map_);
+    nav_state.set("map.dynamic", dynamic_map_);
+    return;
+  }
 
   auto fused = PerceptionsOpsView(nav_state.get_ref<Perceptions>("perceptions"))
     .downsample(dynamic_map_->resolution())
@@ -174,6 +158,9 @@ SimpleMapsManager::update(const NavState & nav_state)
       dynamic_map_->at(cx, cy) = 1;
     }
   }
+
+  nav_state.set("map.static", static_map_);
+  nav_state.set("map.dynamic", dynamic_map_);
 
   dynamic_map_->to_occupancy_grid(dynamic_grid_msg_);
   dynamic_grid_msg_.header.frame_id = "map";

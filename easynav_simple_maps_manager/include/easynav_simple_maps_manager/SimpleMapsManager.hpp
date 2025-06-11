@@ -37,7 +37,6 @@
 #include "tf2_ros/transform_listener.h"
 
 #include "easynav_core/MapsManagerBase.hpp"
-#include "easynav_common/types/MapTypeBase.hpp"
 #include "easynav_simple_common/SimpleMap.hpp"
 
 #include "yaets/tracing.hpp"
@@ -76,13 +75,6 @@ public:
   virtual std::expected<void, std::string> on_initialize() override;
 
   /**
-   * @brief Returns the current static map.
-   *
-   * @return Shared pointer to the static SimpleMap instance.
-   */
-  [[nodiscard]] virtual std::map<std::string, std::shared_ptr<MapsTypeBase>> get_maps() override;
-
-  /**
    * @brief Updates the internal maps using the current navigation state.
    *
    * Intended to be called periodically. May perform dynamic map updates
@@ -90,21 +82,21 @@ public:
    *
    * @param nav_state Current state of the navigation system.
    */
-  virtual void update(const NavState & nav_state) override;
+  virtual void update(NavState & nav_state) override;
 
   /**
    * @brief Replaces the current static map.
    *
    * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
    */
-  void set_static_map(std::shared_ptr<MapsTypeBase> new_map);
+  void set_static_map(std::shared_ptr<SimpleMap> new_map);
 
   /**
    * @brief Replaces the current dynamic map.
    *
    * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
    */
-  void set_dynamic_map(std::shared_ptr<MapsTypeBase> new_map);
+  void set_dynamic_map(std::shared_ptr<SimpleMap> new_map);
 
 protected:
   /**

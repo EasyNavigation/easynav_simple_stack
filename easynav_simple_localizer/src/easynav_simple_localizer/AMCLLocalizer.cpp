@@ -257,13 +257,15 @@ void printTransform(const tf2::Transform & tf)
 }
 
 void
-AMCLLocalizer::update_rt(const NavState & nav_state)
+AMCLLocalizer::update_rt(NavState & nav_state)
 {
   predict(nav_state);
+
+  nav_state.set("robot_pose", get_pose());
 }
 
 void
-AMCLLocalizer::update(const NavState & nav_state)
+AMCLLocalizer::update(NavState & nav_state)
 {
   correct(nav_state);
 
@@ -271,6 +273,9 @@ AMCLLocalizer::update(const NavState & nav_state)
     reseed();
     last_reseed_ = get_node()->now();
   }
+
+  nav_state.set("robot_pose", get_pose());
+
   publishParticles();
 }
 
@@ -286,7 +291,7 @@ AMCLLocalizer::odom_callback(nav_msgs::msg::Odometry::UniquePtr msg)
 }
 
 void
-AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
+AMCLLocalizer::predict([[maybe_unused]] NavState & nav_state)
 {
   if (!initialized_odom_) {
     return;
@@ -337,23 +342,15 @@ AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
   publishEstimatedPose(map2bf);
 }
 
-void AMCLLocalizer::correct(const NavState & nav_state)
+void AMCLLocalizer::correct(NavState & nav_state)
 {
   const auto & perceptions = nav_state.get_ref<Perceptions>("perceptions");
 
   std::shared_ptr<SimpleMap> map_typed;
-
-  try {
-    const auto & map = nav_state.get_ref<std::shared_ptr<MapsTypeBase>>("simple.static");
-
-    map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
-  } catch (std::out_of_range & e) {
-    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a simple.static map");
-    return;
-  }
-
-  if (!map_typed) {
-    std::cerr << "Incorrect Map" << std::endl;
+  if (nav_state.has("map.static")) {
+    map_typed = nav_state.get<std::shared_ptr<SimpleMap>>("map.static");
+  } else {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.static map");
     return;
   }
 
@@ -588,7 +585,7 @@ AMCLLocalizer::publishEstimatedPose(const tf2::Transform & est_pose)
 }
 
 nav_msgs::msg::Odometry
-AMCLLocalizer::get_odom()
+AMCLLocalizer::get_pose()
 {
   nav_msgs::msg::Odometry odom_msg;
 

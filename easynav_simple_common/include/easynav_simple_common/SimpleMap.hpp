@@ -32,7 +32,6 @@
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 
-#include "easynav_common/types/MapTypeBase.hpp"
 
 namespace easynav
 {
@@ -43,7 +42,7 @@ namespace easynav
  *
  * Supports arbitrary metric origins, allowing negative coordinates.
  */
-class SimpleMap : public MapsTypeBase
+class SimpleMap
 {
 public:
   /**

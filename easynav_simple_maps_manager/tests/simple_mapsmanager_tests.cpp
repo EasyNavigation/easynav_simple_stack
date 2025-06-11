@@ -93,17 +93,18 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   p.perception = std::make_shared<std::atomic<std::shared_ptr<easynav::Perception>>>(perception);
   navstate.get_mutable<easynav::Perceptions>("perceptions").push_back(p);
 
+  std::cerr << navstate.debug_string() << std::endl;
+
   manager->update(navstate);
 
-  auto map_ptr = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.dynamic"]);
-  ASSERT_TRUE(map_ptr != nullptr);
+  ASSERT_TRUE(navstate.has("map.dynamic"));
+  auto map = navstate.get_ref<std::shared_ptr<easynav::SimpleMap>>("map.dynamic");
 
-  auto cell1 = map_ptr->metric_to_cell(1.0, 1.0);
-  EXPECT_TRUE(map_ptr->at(cell1.first, cell1.second));
+  auto cell1 = map->metric_to_cell(1.0, 1.0);
+  EXPECT_TRUE(map->at(cell1.first, cell1.second));
 
-  auto cell2 = map_ptr->metric_to_cell(-1.0, -1.0);
-  EXPECT_TRUE(map_ptr->at(cell2.first, cell2.second));
+  auto cell2 = map->metric_to_cell(-1.0, -1.0);
+  EXPECT_TRUE(map->at(cell2.first, cell2.second));
 }
 
 /// \brief Map loading via subscription test
@@ -112,6 +113,8 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node2");
   auto manager = std::make_shared<easynav::SimpleMapsManager>();
   manager->initialize(node, "test2");
+
+  easynav::NavState navstate;
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node->get_node_base_interface());
@@ -133,14 +136,14 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   pub->publish(grid);
 
   executor.spin_some();
+  manager->update(navstate);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  auto static_map = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.static"]);
-  ASSERT_TRUE(static_map != nullptr);
+  ASSERT_TRUE(navstate.has("map.static"));
+  auto map = navstate.get_ref<std::shared_ptr<easynav::SimpleMap>>("map.static");
 
-  EXPECT_EQ(static_map->at(5, 5), 1);
-  EXPECT_EQ(static_map->at(1, 1), 0);
+  EXPECT_EQ(map->at(5, 5), 1);
+  EXPECT_EQ(map->at(1, 1), 0);
 }
 
 class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
