@@ -21,7 +21,9 @@
 /// \brief Implementation of the SimpleMapsManager class.
 
 #include <expected>
+
 #include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
+#include "easynav_common/types/Perceptions.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_package_prefix.hpp"
@@ -141,8 +143,8 @@ SimpleMapsManager::update(NavState & nav_state)
   dynamic_map_->deep_copy(*static_map_);
 
   if (!nav_state.has("perceptions")) {
-    nav_state.set("map.static", static_map_);
-    nav_state.set("map.dynamic", dynamic_map_);
+    nav_state.set_shared_ptr("map.static", static_map_);
+    nav_state.set_shared_ptr("map.dynamic", dynamic_map_);
     return;
   }
 
@@ -159,8 +161,8 @@ SimpleMapsManager::update(NavState & nav_state)
     }
   }
 
-  nav_state.set("map.static", static_map_);
-  nav_state.set("map.dynamic", dynamic_map_);
+  nav_state.set_shared_ptr("map.static", static_map_);
+  nav_state.set_shared_ptr("map.dynamic", dynamic_map_);
 
   dynamic_map_->to_occupancy_grid(dynamic_grid_msg_);
   dynamic_grid_msg_.header.frame_id = "map";

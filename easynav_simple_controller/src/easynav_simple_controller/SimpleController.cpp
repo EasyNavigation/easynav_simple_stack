@@ -26,12 +26,15 @@
 
 #include "easynav_simple_controller/SimpleController.hpp"
 
+#include "nav_msgs/msg/odometry.hpp"
+
 namespace easynav
 {
 
 
 SimpleController::SimpleController()
 {
+  twist_stamped_ = std::make_shared<geometry_msgs::msg::TwistStamped>();
 }
 
 SimpleController::~SimpleController() = default;
@@ -75,13 +78,16 @@ SimpleController::update_rt(NavState & nav_state)
   double dt = (get_node()->now() - last_update_ts_).seconds();
   last_update_ts_ = get_node()->now();
 
+  if (!nav_state.has("path")) {return;}
+  if (!nav_state.has("robot_pose")) {return;}
+
   const auto & path = nav_state.get_ref<nav_msgs::msg::Path>("path");
 
   if (path.poses.empty()) {
-    twist_stamped_.header.frame_id = path.header.frame_id;
-    twist_stamped_.header.stamp = get_node()->now();
-    twist_stamped_.twist.linear.x = 0.0;
-    twist_stamped_.twist.angular.z = 0.0;
+    twist_stamped_->header.frame_id = path.header.frame_id;
+    twist_stamped_->header.stamp = get_node()->now();
+    twist_stamped_->twist.linear.x = 0.0;
+    twist_stamped_->twist.angular.z = 0.0;
     return;
   }
 
@@ -119,12 +125,12 @@ SimpleController::update_rt(NavState & nav_state)
   last_vlin_ = vlin;
   last_vrot_ = vrot;
 
-  twist_stamped_.header.frame_id = path.header.frame_id;
-  twist_stamped_.header.stamp = get_node()->now();
-  twist_stamped_.twist.linear.x = vlin;
-  twist_stamped_.twist.angular.z = vrot;
+  twist_stamped_->header.frame_id = path.header.frame_id;
+  twist_stamped_->header.stamp = get_node()->now();
+  twist_stamped_->twist.linear.x = vlin;
+  twist_stamped_->twist.angular.z = vrot;
 
-  nav_state.set("cmd_vel", twist_stamped_);
+  nav_state.set_shared_ptr("cmd_vel", twist_stamped_);
 }
 
 

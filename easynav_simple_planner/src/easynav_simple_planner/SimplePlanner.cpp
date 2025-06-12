@@ -24,6 +24,9 @@
 
 #include "easynav_simple_planner/SimplePlanner.hpp"
 
+#include "nav_msgs/msg/goals.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+
 namespace easynav
 {
 
@@ -70,17 +73,20 @@ SimplePlanner::update(NavState & nav_state)
 {
   current_path_.poses.clear();
 
+  if (!nav_state.has("goals")) {return;}
+  if (!nav_state.has("robot_pose")) {return;}
+
   const auto & goals = nav_state.get_ref<nav_msgs::msg::Goals>("goals");
 
   if (goals.goals.empty()) {return;}
-  if (!nav_state.has("simple.dynamic")) {
-    RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update simple.dynamic map not found");
+  if (!nav_state.has("map.dynamic")) {
+    RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update map.dynamic map not found");
     return;
   }
 
   std::shared_ptr<SimpleMap> map_typed;
   if (nav_state.has("map.dynamic")) {
-    map_typed = nav_state.get<std::shared_ptr<SimpleMap>>("map.dynamic");
+    map_typed = nav_state.get_ptr<SimpleMap>("map.dynamic");
   } else {
     RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.dynamic map");
     return;

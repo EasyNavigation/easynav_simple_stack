@@ -31,6 +31,7 @@
 #include "easynav_simple_localizer/AMCLLocalizer.hpp"
 #include "easynav_localizer/LocalizerNode.hpp"
 #include "easynav_simple_common/SimpleMap.hpp"
+#include "easynav_common/types/Perceptions.hpp"
 
 namespace easynav
 {
@@ -346,9 +347,11 @@ void AMCLLocalizer::correct(NavState & nav_state)
 {
   const auto & perceptions = nav_state.get_ref<Perceptions>("perceptions");
 
+  std::cerr << nav_state.debug_string() << std::endl;
+
   std::shared_ptr<SimpleMap> map_typed;
   if (nav_state.has("map.static")) {
-    map_typed = nav_state.get<std::shared_ptr<SimpleMap>>("map.static");
+    map_typed = nav_state.get_ptr<SimpleMap>("map.static");
   } else {
     RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.static map");
     return;

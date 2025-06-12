@@ -56,7 +56,7 @@ protected:
   double last_vrot_{0.0};          ///< Previous angular velocity for acceleration limiting.
 
   rclcpp::Time last_update_ts_;    ///< Timestamp of the last control update.
-  geometry_msgs::msg::TwistStamped twist_stamped_;  ///< Current velocity command.
+  std::shared_ptr<geometry_msgs::msg::TwistStamped> twist_stamped_;  ///< Current velocity command.
 
   /// \brief Gets the reference pose at look-ahead distance on the path.
   /// \param path The planned path.

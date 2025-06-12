@@ -155,8 +155,6 @@ private:
    */
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
-  pcl::PointCloud<pcl::PointXYZ> fused_perception_;
-
   std::shared_ptr<yaets::TraceSession> session_;
 };
 

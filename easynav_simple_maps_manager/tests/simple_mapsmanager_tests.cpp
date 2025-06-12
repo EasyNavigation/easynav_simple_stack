@@ -21,6 +21,7 @@
 
 #include "easynav_simple_common/SimpleMap.hpp"
 #include "easynav_common/RTTFBuffer.hpp"
+#include "easynav_common/types/Perceptions.hpp"
 #include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -63,6 +64,7 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
 
   easynav::NavState navstate;
   auto perception = std::make_shared<easynav::Perception>();
+  navstate.set("perceptions", easynav::Perceptions());
 
   perception->data.points.resize(6);
   perception->data.points[0].x = 1.0;
@@ -89,16 +91,14 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->valid = true;
 
   easynav::PerceptionPtr p;
-  navstate.set("perceptions", easynav::Perceptions());
   p.perception = std::make_shared<std::atomic<std::shared_ptr<easynav::Perception>>>(perception);
-  navstate.get_mutable<easynav::Perceptions>("perceptions").push_back(p);
-
-  std::cerr << navstate.debug_string() << std::endl;
+  auto perceptions_ptr = navstate.get_ptr<easynav::Perceptions>("perceptions");
+  perceptions_ptr->push_back(p);
 
   manager->update(navstate);
 
   ASSERT_TRUE(navstate.has("map.dynamic"));
-  auto map = navstate.get_ref<std::shared_ptr<easynav::SimpleMap>>("map.dynamic");
+  auto map = navstate.get_ptr<easynav::SimpleMap>("map.dynamic");
 
   auto cell1 = map->metric_to_cell(1.0, 1.0);
   EXPECT_TRUE(map->at(cell1.first, cell1.second));
@@ -140,10 +140,10 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   ASSERT_TRUE(navstate.has("map.static"));
-  auto map = navstate.get_ref<std::shared_ptr<easynav::SimpleMap>>("map.static");
+  auto map = navstate.get_ref<easynav::SimpleMap>("map.static");
 
-  EXPECT_EQ(map->at(5, 5), 1);
-  EXPECT_EQ(map->at(1, 1), 0);
+  EXPECT_EQ(map.at(5, 5), 1);
+  EXPECT_EQ(map.at(1, 1), 0);
 }
 
 class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
