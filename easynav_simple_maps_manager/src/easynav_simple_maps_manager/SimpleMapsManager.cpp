@@ -24,6 +24,7 @@
 
 #include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
 #include "easynav_common/types/Perceptions.hpp"
+#include "easynav_common/types/PointPerception.hpp"
 
 #include "ament_index_cpp/get_package_share_directory.hpp"
 #include "ament_index_cpp/get_package_prefix.hpp"
@@ -35,6 +36,16 @@ namespace easynav
 
 using std::placeholders::_1;
 
+SimpleMapsManager::SimpleMapsManager()
+{
+  NavState::register_printer<SimpleMap>(
+    [](const SimpleMap & map) {
+      std::string ret = "SimpleMap of (" +
+      std::to_string(map.width()) + " x " +
+      std::to_string(map.height()) + ") with resolution " + std::to_string(map.resolution());
+      return ret;
+    });
+}
 
 SimpleMapsManager::~SimpleMapsManager()
 {
@@ -142,13 +153,15 @@ SimpleMapsManager::update(NavState & nav_state)
 
   dynamic_map_->deep_copy(*static_map_);
 
-  if (!nav_state.has("perceptions")) {
+  if (!nav_state.has("points")) {
     nav_state.set_shared_ptr("map.static", static_map_);
     nav_state.set_shared_ptr("map.dynamic", dynamic_map_);
     return;
   }
 
-  auto fused = PerceptionsOpsView(nav_state.get_ref<Perceptions>("perceptions"))
+  const auto perceptions = nav_state.get_ptr<PointPerceptions>("points");
+
+  auto fused = PointPerceptionsOpsView(*perceptions)
     .downsample(dynamic_map_->resolution())
     .fuse("map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})

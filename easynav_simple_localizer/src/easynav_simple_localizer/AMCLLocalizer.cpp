@@ -27,11 +27,12 @@
 #include "tf2/LinearMath/Vector3.hpp"
 
 #include "easynav_common/RTTFBuffer.hpp"
+#include "easynav_common/types/Perceptions.hpp"
+#include "easynav_common/types/PointPerception.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 #include "easynav_simple_localizer/AMCLLocalizer.hpp"
 #include "easynav_localizer/LocalizerNode.hpp"
-#include "easynav_simple_common/SimpleMap.hpp"
-#include "easynav_common/types/Perceptions.hpp"
 
 namespace easynav
 {
@@ -345,9 +346,12 @@ AMCLLocalizer::predict([[maybe_unused]] NavState & nav_state)
 
 void AMCLLocalizer::correct(NavState & nav_state)
 {
-  const auto & perceptions = nav_state.get_ref<Perceptions>("perceptions");
+  if (!nav_state.has("points")) {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no points perceptions");
+    return;
+  }
 
-  std::cerr << nav_state.debug_string() << std::endl;
+  const auto perceptions = nav_state.get_ptr<PointPerceptions>("points");
 
   std::shared_ptr<SimpleMap> map_typed;
   if (nav_state.has("map.static")) {
@@ -357,7 +361,7 @@ void AMCLLocalizer::correct(NavState & nav_state)
     return;
   }
 
-  const auto & filtered = PerceptionsOpsView(perceptions)
+  const auto & filtered = PointPerceptionsOpsView(*perceptions)
     .downsample(map_typed->resolution())
     .fuse("base_footprint")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})

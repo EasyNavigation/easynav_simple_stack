@@ -58,7 +58,7 @@ public:
   /**
    * @brief Default constructor.
    */
-  SimpleMapsManager() = default;
+  SimpleMapsManager();
 
   /**
    * @brief Destructor.

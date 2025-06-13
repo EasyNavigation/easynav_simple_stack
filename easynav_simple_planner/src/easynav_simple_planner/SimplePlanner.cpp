@@ -78,7 +78,11 @@ SimplePlanner::update(NavState & nav_state)
 
   const auto & goals = nav_state.get_ref<nav_msgs::msg::Goals>("goals");
 
-  if (goals.goals.empty()) {return;}
+  if (goals.goals.empty()) {
+    nav_state.set("path", current_path_);
+    return;
+  }
+
   if (!nav_state.has("map.dynamic")) {
     RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update map.dynamic map not found");
     return;

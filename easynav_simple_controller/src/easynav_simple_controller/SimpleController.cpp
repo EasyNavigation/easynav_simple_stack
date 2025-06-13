@@ -88,6 +88,7 @@ SimpleController::update_rt(NavState & nav_state)
     twist_stamped_->header.stamp = get_node()->now();
     twist_stamped_->twist.linear.x = 0.0;
     twist_stamped_->twist.angular.z = 0.0;
+    nav_state.set_shared_ptr("cmd_vel", twist_stamped_);
     return;
   }
 

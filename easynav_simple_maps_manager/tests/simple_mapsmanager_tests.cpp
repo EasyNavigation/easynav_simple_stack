@@ -22,6 +22,7 @@
 #include "easynav_simple_common/SimpleMap.hpp"
 #include "easynav_common/RTTFBuffer.hpp"
 #include "easynav_common/types/Perceptions.hpp"
+#include "easynav_common/types/PointPerception.hpp"
 #include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -39,6 +40,19 @@ protected:
   void SetUp() override
   {
     rclcpp::init(0, nullptr);
+
+    easynav::NavState::register_printer<easynav::PointPerceptions>(
+      [](const easynav::PointPerceptions & perceptions) {
+        std::ostringstream ret;
+        ret << "PointPerception " << perceptions.size() << " with:\n";
+        for (const auto & perception : perceptions) {
+          auto loaded = perception->load();
+          ret << "\t[" << static_cast<const void *>(perception.get()) << "] --> "
+              << loaded->data.size() << " points in frame [" << loaded->frame_id
+              << "] with ts " << loaded->stamp.seconds() << "\n";
+        }
+        return ret.str();
+      });
   }
 
   void TearDown() override
@@ -63,8 +77,8 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   manager->set_static_map(static_map);
 
   easynav::NavState navstate;
-  auto perception = std::make_shared<easynav::Perception>();
-  navstate.set("perceptions", easynav::Perceptions());
+  auto perception = std::make_shared<easynav::PointPerception>();
+  navstate.set("points", easynav::PointPerceptions());
 
   perception->data.points.resize(6);
   perception->data.points[0].x = 1.0;
@@ -90,10 +104,10 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->frame_id = "map";
   perception->valid = true;
 
-  easynav::PerceptionPtr p;
-  p.perception = std::make_shared<std::atomic<std::shared_ptr<easynav::Perception>>>(perception);
-  auto perceptions_ptr = navstate.get_ptr<easynav::Perceptions>("perceptions");
-  perceptions_ptr->push_back(p);
+  auto perception_entry =
+    std::make_shared<std::atomic<std::shared_ptr<easynav::PointPerception>>>(perception);
+  auto perceptions = navstate.get_ptr<easynav::PointPerceptions>("points");
+  perceptions->push_back(perception_entry);
 
   manager->update(navstate);
 
