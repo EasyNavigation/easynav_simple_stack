@@ -182,6 +182,8 @@ AMCLLocalizer::on_initialize()
   node->declare_parameter<double>(plugin_name + ".noise_translation", 0.01);
   node->declare_parameter<double>(plugin_name + ".noise_rotation", 0.01);
   node->declare_parameter<double>(plugin_name + ".noise_translation_to_rotation", 0.01);
+  node->declare_parameter<double>(plugin_name + ".min_noise_xy", 0.05);
+  node->declare_parameter<double>(plugin_name + ".min_noise_yaw", 0.05);
 
   node->get_parameter<int>(plugin_name + ".num_particles", num_particles);
   node->get_parameter<double>(plugin_name + ".initial_pose.x", x_init);
@@ -193,6 +195,8 @@ AMCLLocalizer::on_initialize()
   node->get_parameter<double>(plugin_name + ".noise_rotation", noise_rotation_);
   node->get_parameter<double>(plugin_name + ".noise_translation_to_rotation",
     noise_translation_to_rotation_);
+  node->get_parameter<double>(plugin_name + ".min_noise_xy", min_noise_xy_);
+  node->get_parameter<double>(plugin_name + ".min_noise_yaw", min_noise_yaw_);
 
   double reseed_freq;
   node->get_parameter<double>(plugin_name + ".reseed_freq", reseed_freq);
@@ -446,8 +450,7 @@ AMCLLocalizer::reseed()
 
   double yaw_variance = computeYawVariance(particles_, 0, N_top);
   double yaw_stddev = std::sqrt(yaw_variance);
-  std::normal_distribution<double> yaw_noise(0.0, yaw_stddev);
-
+  std::normal_distribution<double> yaw_noise(0.0, std::max(yaw_stddev, min_noise_yaw_));
   std::normal_distribution<double> index_dist(0.0, 0.05 * static_cast<double>(N));
   std::normal_distribution<double> standard_normal(0.0, 1.0);
 
@@ -459,7 +462,6 @@ AMCLLocalizer::reseed()
 
     const auto & ref_particle = particles_[selected_idx];
 
-
     tf2::Vector3 origin = ref_particle.pose.getOrigin();
 
     double z0 = standard_normal(rng_);
@@ -467,7 +469,10 @@ AMCLLocalizer::reseed()
     double dx = l00 * z0;
     double dy = l10 * z0 + l11 * z1;
 
-    tf2::Vector3 new_origin(origin.x() + dx, origin.y() + dy, 0.0);
+    std::normal_distribution<double> xy_noise(0.0, std::max(sqrt(dx * dx + dy * dy),
+      min_noise_xy_));
+
+    tf2::Vector3 new_origin(origin.x() + xy_noise(rng_), origin.y() + xy_noise(rng_), 0.0);
 
     double roll, pitch, yaw;
     tf2::Matrix3x3(ref_particle.pose.getRotation()).getRPY(roll, pitch, yaw);

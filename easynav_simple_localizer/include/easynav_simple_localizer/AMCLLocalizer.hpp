@@ -106,6 +106,8 @@ protected:
   double noise_translation_ {0.01};
   double noise_rotation_ {0.01};
   double noise_translation_to_rotation_ {0.01};
+  double min_noise_xy_ {0.05};
+  double min_noise_yaw_ {0.05};
 
   tf2::Transform odom_{tf2::Transform::getIdentity()};
   tf2::Transform last_odom_{tf2::Transform::getIdentity()};
