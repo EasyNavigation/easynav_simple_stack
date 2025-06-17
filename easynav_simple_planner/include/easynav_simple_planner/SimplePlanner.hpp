@@ -40,7 +40,7 @@ class SimplePlanner : public PlannerMethodBase
 {
 public:
   /// \brief Default constructor
-  explicit SimplePlanner() = default;
+  explicit SimplePlanner();
 
   /**
    * @brief Initializes the planner.

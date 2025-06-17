@@ -46,10 +46,9 @@ protected:
         std::ostringstream ret;
         ret << "PointPerception " << perceptions.size() << " with:\n";
         for (const auto & perception : perceptions) {
-          auto loaded = perception->load();
           ret << "\t[" << static_cast<const void *>(perception.get()) << "] --> "
-              << loaded->data.size() << " points in frame [" << loaded->frame_id
-              << "] with ts " << loaded->stamp.seconds() << "\n";
+              << perception->data.size() << " points in frame [" << perception->frame_id
+              << "] with ts " << perception->stamp.seconds() << "\n";
         }
         return ret.str();
       });
@@ -104,10 +103,8 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->frame_id = "map";
   perception->valid = true;
 
-  auto perception_entry =
-    std::make_shared<std::atomic<std::shared_ptr<easynav::PointPerception>>>(perception);
   auto perceptions = navstate.get_ptr<easynav::PointPerceptions>("points");
-  perceptions->push_back(perception_entry);
+  perceptions->push_back(perception);
 
   manager->update(navstate);
 

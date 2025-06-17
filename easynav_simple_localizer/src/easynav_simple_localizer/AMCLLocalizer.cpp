@@ -159,6 +159,29 @@ computeYawVariance(
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
+
+AMCLLocalizer::AMCLLocalizer()
+{
+  NavState::register_printer<nav_msgs::msg::Odometry>(
+    [](const nav_msgs::msg::Odometry & odom) {
+      std::ostringstream ret;
+      double x = odom.pose.pose.position.x;
+      double y = odom.pose.pose.position.y;
+
+      tf2::Quaternion q(
+        odom.pose.pose.orientation.x,
+        odom.pose.pose.orientation.y,
+        odom.pose.pose.orientation.z,
+        odom.pose.pose.orientation.w);
+
+      double roll, pitch, yaw;
+      tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+      ret << "Odometry with pose: (x: " << x << ", y: " << y << ", yaw: " << yaw << ")";
+      return ret.str();
+    });
+}
+
 AMCLLocalizer::~AMCLLocalizer()
 {
 }

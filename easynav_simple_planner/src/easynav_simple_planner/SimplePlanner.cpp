@@ -52,6 +52,40 @@ std::vector<std::pair<int, int>> neighbors8 = {
   {1, -1}, {1, 0}, {1, 1}
 };
 
+double compute_path_length(const nav_msgs::msg::Path & path)
+{
+  double total_length = 0.0;
+
+  if (path.poses.size() < 2) {
+    return 0.0;
+  }
+
+  for (size_t i = 1; i < path.poses.size(); ++i) {
+    const auto & p1 = path.poses[i - 1].pose.position;
+    const auto & p2 = path.poses[i].pose.position;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    total_length += std::sqrt(dx * dx + dy * dy);
+  }
+
+  return total_length;
+}
+
+
+SimplePlanner::SimplePlanner()
+{
+  NavState::register_printer<nav_msgs::msg::Path>(
+    [](const nav_msgs::msg::Path & path) {
+      std::ostringstream ret;
+
+      ret << "Path with " << path.poses.size() << " poses and length" <<
+        compute_path_length(path) << " m.";
+
+      return ret.str();
+    });
+}
+
 std::expected<void, std::string>
 SimplePlanner::on_initialize()
 {

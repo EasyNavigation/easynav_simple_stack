@@ -59,7 +59,7 @@ public:
   /**
    * @brief Default constructor.
    */
-  AMCLLocalizer() = default;
+  AMCLLocalizer();
 
   /**
    * @brief Destructor.
