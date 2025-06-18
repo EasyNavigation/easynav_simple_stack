@@ -162,6 +162,8 @@ using namespace std::chrono_literals;
 
 AMCLLocalizer::AMCLLocalizer()
 {
+  pose_ = std::make_shared<nav_msgs::msg::Odometry>();
+
   NavState::register_printer<nav_msgs::msg::Odometry>(
     [](const nav_msgs::msg::Odometry & odom) {
       std::ostringstream ret;
@@ -290,7 +292,8 @@ AMCLLocalizer::update_rt(NavState & nav_state)
 {
   predict(nav_state);
 
-  nav_state.set("robot_pose", get_pose());
+  *pose_ = get_pose();
+  nav_state.set_shared_ptr("robot_pose", pose_);
 }
 
 void
@@ -303,7 +306,8 @@ AMCLLocalizer::update(NavState & nav_state)
     last_reseed_ = get_node()->now();
   }
 
-  nav_state.set("robot_pose", get_pose());
+  *pose_ = get_pose();
+  nav_state.set_shared_ptr("robot_pose", pose_);
 
   publishParticles();
 }
