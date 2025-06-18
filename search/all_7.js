@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['of_20save_20service_0',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['on_5finitialize_1',['on_initialize',['../classeasynav_1_1SimpleMapsManager.html#aa09f4316ce265b452c96e6d74101cd76',1,'easynav::SimpleMapsManager']]]
+  ['parameters_0',['Parameters',['../index.html#autotoc_md5',1,'']]],
+  ['plugin_20configuration_1',['Example Plugin Configuration',['../index.html#autotoc_md13',1,'']]],
+  ['plugin_20for_20easy_20navigation_2',['SimpleMapsManager Plugin for Easy Navigation',['../index.html#autotoc_md1',1,'']]]
 ];

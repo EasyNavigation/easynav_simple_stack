@@ -1,15 +1,6 @@
 var searchData=
 [
-  ['save_20service_0',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['service_1',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['services_2',['Services',['../index.html#autotoc_md9',1,'']]],
-  ['set_5fdynamic_5fmap_3',['set_dynamic_map',['../classeasynav_1_1SimpleMapsManager.html#a8c4d7ed0b818e6fef996c467179f5f6f',1,'easynav::SimpleMapsManager']]],
-  ['set_5fstatic_5fmap_4',['set_static_map',['../classeasynav_1_1SimpleMapsManager.html#afd731e7385cf9a7a8cde5d2e3894b122',1,'easynav::SimpleMapsManager']]],
-  ['setup_5',['SetUp',['../classSimpleMapsManagerTest.html#a3a1707f6479611fdc609a3eb8a0cef1b',1,'SimpleMapsManagerTest']]],
-  ['simple_5fmapsmanager_5ftests_2ecpp_6',['simple_mapsmanager_tests.cpp',['../simple__mapsmanager__tests_8cpp.html',1,'']]],
-  ['simplemapsmanager_7',['SimpleMapsManager',['../classeasynav_1_1SimpleMapsManager.html',1,'SimpleMapsManager'],['../classeasynav_1_1SimpleMapsManager.html#a7a87ead6697aa52403c721144327c71a',1,'easynav::SimpleMapsManager::SimpleMapsManager()']]],
-  ['simplemapsmanager_20plugin_20for_20easy_20navigation_8',['SimpleMapsManager Plugin for Easy Navigation',['../index.html#autotoc_md1',1,'']]],
-  ['simplemapsmanager_2ecpp_9',['SimpleMapsManager.cpp',['../SimpleMapsManager_8cpp.html',1,'']]],
-  ['simplemapsmanager_2ehpp_10',['SimpleMapsManager.hpp',['../SimpleMapsManager_8hpp.html',1,'']]],
-  ['simplemapsmanagertest_11',['SimpleMapsManagerTest',['../classSimpleMapsManagerTest.html',1,'']]]
+  ['teardown_0',['TearDown',['../classSimpleMapsManagerTest.html#ac4fca95dc3b93372ce7f2078baf8e8b6',1,'SimpleMapsManagerTest']]],
+  ['test_5ff_1',['TEST_F',['../simple__mapsmanager__tests_8cpp.html#af1db4e74edfbc664f89489b2e0dc2f9d',1,'TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate):&#160;simple_mapsmanager_tests.cpp'],['../simple__mapsmanager__tests_8cpp.html#a53e5dac0fc184376b724ad067cc06150',1,'TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps):&#160;simple_mapsmanager_tests.cpp'],['../simple__mapsmanager__tests_8cpp.html#a65c0da404c7ee04c205fe84d467c980e',1,'TEST_F(SimpleMapsManagerTest, SavemapServiceWorks):&#160;simple_mapsmanager_tests.cpp']]],
+  ['topics_2',['Topics',['../index.html#autotoc_md7',1,'']]]
 ];
