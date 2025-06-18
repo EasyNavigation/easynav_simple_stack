@@ -27,10 +27,12 @@
 #include "tf2/LinearMath/Vector3.hpp"
 
 #include "easynav_common/RTTFBuffer.hpp"
+#include "easynav_common/types/Perceptions.hpp"
+#include "easynav_common/types/PointPerception.hpp"
+#include "easynav_simple_common/SimpleMap.hpp"
 
 #include "easynav_simple_localizer/AMCLLocalizer.hpp"
 #include "easynav_localizer/LocalizerNode.hpp"
-#include "easynav_simple_common/SimpleMap.hpp"
 
 namespace easynav
 {
@@ -157,6 +159,29 @@ computeYawVariance(
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
+
+AMCLLocalizer::AMCLLocalizer()
+{
+  NavState::register_printer<nav_msgs::msg::Odometry>(
+    [](const nav_msgs::msg::Odometry & odom) {
+      std::ostringstream ret;
+      double x = odom.pose.pose.position.x;
+      double y = odom.pose.pose.position.y;
+
+      tf2::Quaternion q(
+        odom.pose.pose.orientation.x,
+        odom.pose.pose.orientation.y,
+        odom.pose.pose.orientation.z,
+        odom.pose.pose.orientation.w);
+
+      double roll, pitch, yaw;
+      tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+      ret << "Odometry with pose: (x: " << x << ", y: " << y << ", yaw: " << yaw << ")";
+      return ret.str();
+    });
+}
+
 AMCLLocalizer::~AMCLLocalizer()
 {
 }
@@ -180,6 +205,8 @@ AMCLLocalizer::on_initialize()
   node->declare_parameter<double>(plugin_name + ".noise_translation", 0.01);
   node->declare_parameter<double>(plugin_name + ".noise_rotation", 0.01);
   node->declare_parameter<double>(plugin_name + ".noise_translation_to_rotation", 0.01);
+  node->declare_parameter<double>(plugin_name + ".min_noise_xy", 0.05);
+  node->declare_parameter<double>(plugin_name + ".min_noise_yaw", 0.05);
 
   node->get_parameter<int>(plugin_name + ".num_particles", num_particles);
   node->get_parameter<double>(plugin_name + ".initial_pose.x", x_init);
@@ -191,6 +218,8 @@ AMCLLocalizer::on_initialize()
   node->get_parameter<double>(plugin_name + ".noise_rotation", noise_rotation_);
   node->get_parameter<double>(plugin_name + ".noise_translation_to_rotation",
     noise_translation_to_rotation_);
+  node->get_parameter<double>(plugin_name + ".min_noise_xy", min_noise_xy_);
+  node->get_parameter<double>(plugin_name + ".min_noise_yaw", min_noise_yaw_);
 
   double reseed_freq;
   node->get_parameter<double>(plugin_name + ".reseed_freq", reseed_freq);
@@ -257,13 +286,15 @@ void printTransform(const tf2::Transform & tf)
 }
 
 void
-AMCLLocalizer::update_rt(const NavState & nav_state)
+AMCLLocalizer::update_rt(NavState & nav_state)
 {
   predict(nav_state);
+
+  nav_state.set("robot_pose", get_pose());
 }
 
 void
-AMCLLocalizer::update(const NavState & nav_state)
+AMCLLocalizer::update(NavState & nav_state)
 {
   correct(nav_state);
 
@@ -271,6 +302,9 @@ AMCLLocalizer::update(const NavState & nav_state)
     reseed();
     last_reseed_ = get_node()->now();
   }
+
+  nav_state.set("robot_pose", get_pose());
+
   publishParticles();
 }
 
@@ -286,7 +320,7 @@ AMCLLocalizer::odom_callback(nav_msgs::msg::Odometry::UniquePtr msg)
 }
 
 void
-AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
+AMCLLocalizer::predict([[maybe_unused]] NavState & nav_state)
 {
   if (!initialized_odom_) {
     return;
@@ -337,31 +371,28 @@ AMCLLocalizer::predict([[maybe_unused]] const NavState & nav_state)
   publishEstimatedPose(map2bf);
 }
 
-void AMCLLocalizer::correct(const NavState & nav_state)
+void AMCLLocalizer::correct(NavState & nav_state)
 {
-  const auto & perceptions = nav_state.perceptions;
-
-  std::shared_ptr<SimpleMap> map_typed;
-
-  try {
-    const auto map = nav_state.maps.at("simple.static");
-    map_typed = std::dynamic_pointer_cast<SimpleMap>(map);
-  } catch (std::out_of_range & e) {
-    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a simple.static map");
+  if (!nav_state.has("points")) {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no points perceptions");
     return;
   }
 
-  if (!map_typed) {
-    std::cerr << "Incorrect Map" << std::endl;
+  const auto perceptions = nav_state.get<PointPerceptions>("points");
+
+  if (!nav_state.has("map.static")) {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.static map");
     return;
   }
 
-  const auto & filtered = PerceptionsOpsView(perceptions)
-    .downsample(map_typed->resolution())
+  const auto & map_static = nav_state.get<SimpleMap>("map.static");
+
+  const auto & filtered = PointPerceptionsOpsView(perceptions)
+    .downsample(map_static.resolution())
     .fuse("base_footprint")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .collapse({NAN, NAN, 0.1})
-    ->downsample(map_typed->resolution())
+    ->downsample(map_static.resolution())
     .as_points();
 
   if (filtered.empty()) {
@@ -376,12 +407,12 @@ void AMCLLocalizer::correct(const NavState & nav_state)
     for (const auto & pt : filtered) {
       tf2::Vector3 pt_world = particle.pose * tf2::Vector3(pt.x, pt.y, pt.z);
 
-      if (!map_typed->check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
+      if (!map_static.check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
 
       try {
-        auto [cell_x, cell_y] = map_typed->metric_to_cell(pt_world.x(), pt_world.y());
+        auto [cell_x, cell_y] = map_static.metric_to_cell(pt_world.x(), pt_world.y());
         ++possible_hits;
-        if (map_typed->at(cell_x, cell_y)) {
+        if (map_static.at(cell_x, cell_y)) {
           ++hits;
         }
       } catch (const std::out_of_range & e) {
@@ -441,8 +472,7 @@ AMCLLocalizer::reseed()
 
   double yaw_variance = computeYawVariance(particles_, 0, N_top);
   double yaw_stddev = std::sqrt(yaw_variance);
-  std::normal_distribution<double> yaw_noise(0.0, yaw_stddev);
-
+  std::normal_distribution<double> yaw_noise(0.0, std::max(yaw_stddev, min_noise_yaw_));
   std::normal_distribution<double> index_dist(0.0, 0.05 * static_cast<double>(N));
   std::normal_distribution<double> standard_normal(0.0, 1.0);
 
@@ -454,7 +484,6 @@ AMCLLocalizer::reseed()
 
     const auto & ref_particle = particles_[selected_idx];
 
-
     tf2::Vector3 origin = ref_particle.pose.getOrigin();
 
     double z0 = standard_normal(rng_);
@@ -462,7 +491,10 @@ AMCLLocalizer::reseed()
     double dx = l00 * z0;
     double dy = l10 * z0 + l11 * z1;
 
-    tf2::Vector3 new_origin(origin.x() + dx, origin.y() + dy, 0.0);
+    std::normal_distribution<double> xy_noise(0.0, std::max(sqrt(dx * dx + dy * dy),
+      min_noise_xy_));
+
+    tf2::Vector3 new_origin(origin.x() + xy_noise(rng_), origin.y() + xy_noise(rng_), 0.0);
 
     double roll, pitch, yaw;
     tf2::Matrix3x3(ref_particle.pose.getRotation()).getRPY(roll, pitch, yaw);
@@ -587,7 +619,7 @@ AMCLLocalizer::publishEstimatedPose(const tf2::Transform & est_pose)
 }
 
 nav_msgs::msg::Odometry
-AMCLLocalizer::get_odom()
+AMCLLocalizer::get_pose()
 {
   nav_msgs::msg::Odometry odom_msg;
 

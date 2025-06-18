@@ -24,6 +24,9 @@
 
 #include "easynav_simple_planner/SimplePlanner.hpp"
 
+#include "nav_msgs/msg/goals.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+
 namespace easynav
 {
 
@@ -49,6 +52,40 @@ std::vector<std::pair<int, int>> neighbors8 = {
   {1, -1}, {1, 0}, {1, 1}
 };
 
+double compute_path_length(const nav_msgs::msg::Path & path)
+{
+  double total_length = 0.0;
+
+  if (path.poses.size() < 2) {
+    return 0.0;
+  }
+
+  for (size_t i = 1; i < path.poses.size(); ++i) {
+    const auto & p1 = path.poses[i - 1].pose.position;
+    const auto & p2 = path.poses[i].pose.position;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    total_length += std::sqrt(dx * dx + dy * dy);
+  }
+
+  return total_length;
+}
+
+
+SimplePlanner::SimplePlanner()
+{
+  NavState::register_printer<nav_msgs::msg::Path>(
+    [](const nav_msgs::msg::Path & path) {
+      std::ostringstream ret;
+
+      ret << "Path with " << path.poses.size() << " poses and length" <<
+        compute_path_length(path) << " m.";
+
+      return ret.str();
+    });
+}
+
 std::expected<void, std::string>
 SimplePlanner::on_initialize()
 {
@@ -66,24 +103,41 @@ SimplePlanner::on_initialize()
 }
 
 void
-SimplePlanner::update(const NavState & nav_state)
+SimplePlanner::update(NavState & nav_state)
 {
   current_path_.poses.clear();
 
-  if (nav_state.goals.goals.empty()) {return;}
-  if (!nav_state.maps.contains("simple.dynamic")) {
-    RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update simple.dynamic map not found");
+  if (!nav_state.has("goals")) {return;}
+  if (!nav_state.has("robot_pose")) {return;}
+
+  const auto goals = nav_state.get<nav_msgs::msg::Goals>("goals");
+
+  if (goals.goals.empty()) {
+    nav_state.set("path", current_path_);
     return;
   }
 
-  const auto & map = dynamic_cast<const SimpleMap &>(*nav_state.maps.at("simple.dynamic"));
-  const auto & goal = nav_state.goals.goals.front().pose;
+  if (!nav_state.has("map.dynamic")) {
+    RCLCPP_WARN(get_node()->get_logger(), "SimplePlanner::update map.dynamic map not found");
+    return;
+  }
 
-  auto downsampled_map = map.downsample(0.2);
+  SimpleMap map_typed;
+  if (nav_state.has("map.dynamic")) {
+    map_typed = nav_state.get<SimpleMap>("map.dynamic");
+  } else {
+    RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.dynamic map");
+    return;
+  }
 
-  if (nav_state.goals.header.frame_id != "map") {
+  const auto robot_pose = nav_state.get<nav_msgs::msg::Odometry>("robot_pose");
+  const auto & goal = goals.goals.front().pose;
+
+  auto downsampled_map = map_typed.downsample(0.2);
+
+  if (goals.header.frame_id != "map") {
     RCLCPP_WARN(get_node()->get_logger(),
-      "SimplePlanner::update goals frame is not map (%s)", nav_state.goals.header.frame_id.c_str());
+      "SimplePlanner::update goals frame is not map (%s)", goals.header.frame_id.c_str());
     return;
   }
 
@@ -95,17 +149,17 @@ SimplePlanner::update(const NavState & nav_state)
 
   auto poses = a_star_path(
     *downsampled_map,
-    nav_state.odom.pose.pose,
+    robot_pose.pose.pose,
     goal,
     downsampled_map->resolution());
 
   if (!poses.empty()) {
     current_path_.header.stamp = get_node()->now();
-    current_path_.header.frame_id = nav_state.goals.header.frame_id;
+    current_path_.header.frame_id = goals.header.frame_id;
 
     for (const auto & pose : poses) {
       geometry_msgs::msg::PoseStamped pose_stamped;
-      pose_stamped.header.frame_id = nav_state.goals.header.frame_id;
+      pose_stamped.header.frame_id = goals.header.frame_id;
       pose_stamped.header.stamp = get_node()->now();
       pose_stamped.pose = pose;
       current_path_.poses.push_back(pose_stamped);
@@ -115,13 +169,10 @@ SimplePlanner::update(const NavState & nav_state)
       path_pub_->publish(current_path_);
     }
   }
+
+  nav_state.set("path", current_path_);
 }
 
-nav_msgs::msg::Path
-SimplePlanner::get_path()
-{
-  return current_path_;
-}
 
 bool
 SimplePlanner::isFreeWithClearance(

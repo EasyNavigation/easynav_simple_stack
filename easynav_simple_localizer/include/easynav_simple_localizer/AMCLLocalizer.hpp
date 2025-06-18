@@ -59,7 +59,7 @@ public:
   /**
    * @brief Default constructor.
    */
-  AMCLLocalizer() = default;
+  AMCLLocalizer();
 
   /**
    * @brief Destructor.
@@ -75,12 +75,12 @@ public:
    */
   virtual std::expected<void, std::string> on_initialize() override;
 
-  void update_rt(const NavState & nav_state) override;
-  void update(const NavState & nav_state) override;
+  void update_rt(NavState & nav_state) override;
+  void update(NavState & nav_state) override;
 
 
   tf2::Transform getEstimatedPose() const;
-  nav_msgs::msg::Odometry get_odom() override;
+  nav_msgs::msg::Odometry get_pose();
 
 protected:
   void initializeParticles();
@@ -88,8 +88,8 @@ protected:
   void publishParticles();
   void publishEstimatedPose(const tf2::Transform & est_pose);
 
-  void predict(const NavState & nav_state);
-  void correct(const NavState & nav_state);
+  void predict(NavState & nav_state);
+  void correct(NavState & nav_state);
   void reseed();
 
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -102,10 +102,13 @@ protected:
 
   std::vector<Particle> particles_;
   std::default_random_engine rng_;
+  nav_msgs::msg::Odometry pose_;
 
   double noise_translation_ {0.01};
   double noise_rotation_ {0.01};
   double noise_translation_to_rotation_ {0.01};
+  double min_noise_xy_ {0.05};
+  double min_noise_yaw_ {0.05};
 
   tf2::Transform odom_{tf2::Transform::getIdentity()};
   tf2::Transform last_odom_{tf2::Transform::getIdentity()};

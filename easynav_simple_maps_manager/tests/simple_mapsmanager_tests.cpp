@@ -21,6 +21,8 @@
 
 #include "easynav_simple_common/SimpleMap.hpp"
 #include "easynav_common/RTTFBuffer.hpp"
+#include "easynav_common/types/Perceptions.hpp"
+#include "easynav_common/types/PointPerception.hpp"
 #include "easynav_simple_maps_manager/SimpleMapsManager.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -38,6 +40,18 @@ protected:
   void SetUp() override
   {
     rclcpp::init(0, nullptr);
+
+    easynav::NavState::register_printer<easynav::PointPerceptions>(
+      [](const easynav::PointPerceptions & perceptions) {
+        std::ostringstream ret;
+        ret << "PointPerception " << perceptions.size() << " with:\n";
+        for (const auto & perception : perceptions) {
+          ret << "\t[" << static_cast<const void *>(perception.get()) << "] --> "
+              << perception->data.size() << " points in frame [" << perception->frame_id
+              << "] with ts " << perception->stamp.seconds() << "\n";
+        }
+        return ret.str();
+      });
   }
 
   void TearDown() override
@@ -57,12 +71,13 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   auto tf_buffer = easynav::RTTFBuffer::getInstance(node->get_clock());
   tf2_ros::TransformListener tf_listener(*tf_buffer, node, true);
 
-  auto static_map = std::make_shared<easynav::SimpleMap>();
-  static_map->initialize(30, 30, 0.1, -1.5, -1.5, 0.0);
+  easynav::SimpleMap static_map;
+  static_map.initialize(30, 30, 0.1, -1.5, -1.5, 0.0);
   manager->set_static_map(static_map);
 
   easynav::NavState navstate;
-  auto perception = std::make_shared<easynav::Perception>();
+  auto perception = std::make_shared<easynav::PointPerception>();
+  navstate.set("points", easynav::PointPerceptions());
 
   perception->data.points.resize(6);
   perception->data.points[0].x = 1.0;
@@ -88,21 +103,20 @@ TEST_F(SimpleMapsManagerTest, BasicDynamicUpdate)
   perception->frame_id = "map";
   perception->valid = true;
 
-  easynav::PerceptionPtr p;
-  p.perception = std::make_shared<std::atomic<std::shared_ptr<easynav::Perception>>>(perception);
-  navstate.perceptions.push_back(p);
+  easynav::PointPerceptions perceptions;
+  perceptions.push_back(perception);
+  navstate.set("points", perceptions);
 
   manager->update(navstate);
 
-  auto map_ptr = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.dynamic"]);
-  ASSERT_TRUE(map_ptr != nullptr);
+  ASSERT_TRUE(navstate.has("map.dynamic"));
+  auto map = navstate.get<easynav::SimpleMap>("map.dynamic");
 
-  auto cell1 = map_ptr->metric_to_cell(1.0, 1.0);
-  EXPECT_TRUE(map_ptr->at(cell1.first, cell1.second));
+  auto cell1 = map.metric_to_cell(1.0, 1.0);
+  EXPECT_TRUE(map.at(cell1.first, cell1.second));
 
-  auto cell2 = map_ptr->metric_to_cell(-1.0, -1.0);
-  EXPECT_TRUE(map_ptr->at(cell2.first, cell2.second));
+  auto cell2 = map.metric_to_cell(-1.0, -1.0);
+  EXPECT_TRUE(map.at(cell2.first, cell2.second));
 }
 
 /// \brief Map loading via subscription test
@@ -111,6 +125,8 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node2");
   auto manager = std::make_shared<easynav::SimpleMapsManager>();
   manager->initialize(node, "test2");
+
+  easynav::NavState navstate;
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node->get_node_base_interface());
@@ -132,14 +148,14 @@ TEST_F(SimpleMapsManagerTest, IncomingOccupancyGridUpdatesMaps)
   pub->publish(grid);
 
   executor.spin_some();
+  manager->update(navstate);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  auto static_map = std::dynamic_pointer_cast<easynav::SimpleMap>(
-    manager->get_maps()["simple.static"]);
-  ASSERT_TRUE(static_map != nullptr);
+  ASSERT_TRUE(navstate.has("map.static"));
+  const auto & map = navstate.get<easynav::SimpleMap>("map.static");
 
-  EXPECT_EQ(static_map->at(5, 5), 1);
-  EXPECT_EQ(static_map->at(1, 1), 0);
+  EXPECT_EQ(map.at(5, 5), 1);
+  EXPECT_EQ(map.at(1, 1), 0);
 }
 
 class FriendSimpleMapsManager : public easynav::SimpleMapsManager {
@@ -153,11 +169,11 @@ TEST_F(SimpleMapsManagerTest, SavemapServiceWorks)
   auto manager = std::make_shared<easynav::SimpleMapsManager>();
   manager->initialize(node, "test_savemap");
 
-  auto static_map = std::make_shared<easynav::SimpleMap>();
-  static_map->initialize(4, 4, 0.5, -1.0, -1.0, 0);
-  static_map->at(1, 1) = true;
-  static_map->at(2, 2) = true;
-  manager->set_static_map(static_map);
+  easynav::SimpleMap map_static;
+  map_static.initialize(4, 4, 0.5, -1.0, -1.0, 0);
+  map_static.at(1, 1) = true;
+  map_static.at(2, 2) = true;
+  manager->set_static_map(map_static);
 
   const std::string test_map_file = "/tmp/savemap_test_map.txt";
   const std::string service_name = "/test_savemap_node/test_savemap/savemap";

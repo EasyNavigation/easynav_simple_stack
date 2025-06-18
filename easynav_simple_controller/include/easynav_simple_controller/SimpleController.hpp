@@ -38,11 +38,7 @@ public:
 
   /// \brief Updates the controller using the given NavState.
   /// \param nav_state Current navigation state, including odometry and planned path.
-  void update_rt(const NavState & nav_state) override;
-
-  /// \brief Returns the latest computed velocity command.
-  /// \return TwistStamped containing linear and angular velocities.
-  geometry_msgs::msg::TwistStamped get_cmd_vel() override;
+  void update_rt(NavState & nav_state) override;
 
 protected:
   std::shared_ptr<PIDController> linear_pid_;   ///< PID controller for linear velocity.

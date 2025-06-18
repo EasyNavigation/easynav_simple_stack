@@ -26,6 +26,8 @@
 
 #include "easynav_simple_controller/SimpleController.hpp"
 
+#include "nav_msgs/msg/odometry.hpp"
+
 namespace easynav
 {
 
@@ -70,23 +72,27 @@ SimpleController::on_initialize()
 
 
 void
-SimpleController::update_rt(const NavState & nav_state)
+SimpleController::update_rt(NavState & nav_state)
 {
   double dt = (get_node()->now() - last_update_ts_).seconds();
   last_update_ts_ = get_node()->now();
 
-  const auto & path = nav_state.path;
+  if (!nav_state.has("path")) {return;}
+  if (!nav_state.has("robot_pose")) {return;}
+
+  const auto path = nav_state.get<nav_msgs::msg::Path>("path");
 
   if (path.poses.empty()) {
     twist_stamped_.header.frame_id = path.header.frame_id;
     twist_stamped_.header.stamp = get_node()->now();
     twist_stamped_.twist.linear.x = 0.0;
     twist_stamped_.twist.angular.z = 0.0;
+    nav_state.set("cmd_vel", twist_stamped_);
     return;
   }
 
   auto ref_pose = get_ref_pose(path, look_ahead_dist_);
-  const auto & pose = nav_state.odom.pose.pose;
+  const auto pose = nav_state.get<nav_msgs::msg::Odometry>("robot_pose").pose.pose;
 
   double dist = get_distance(pose, ref_pose);
 
@@ -123,14 +129,10 @@ SimpleController::update_rt(const NavState & nav_state)
   twist_stamped_.header.stamp = get_node()->now();
   twist_stamped_.twist.linear.x = vlin;
   twist_stamped_.twist.angular.z = vrot;
+
+  nav_state.set("cmd_vel", twist_stamped_);
 }
 
-
-geometry_msgs::msg::TwistStamped
-SimpleController::get_cmd_vel()
-{
-  return twist_stamped_;
-}
 
 geometry_msgs::msg::Pose
 SimpleController::get_ref_pose(const nav_msgs::msg::Path & path, double look_ahead)

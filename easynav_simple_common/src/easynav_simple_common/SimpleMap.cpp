@@ -18,12 +18,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <vector>
-#include <stdexcept>
 #include <algorithm>
-#include <utility>  // std::pair
+#include <cmath>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 

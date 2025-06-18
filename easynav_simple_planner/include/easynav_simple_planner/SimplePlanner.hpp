@@ -40,7 +40,7 @@ class SimplePlanner : public PlannerMethodBase
 {
 public:
   /// \brief Default constructor
-  explicit SimplePlanner() = default;
+  explicit SimplePlanner();
 
   /**
    * @brief Initializes the planner.
@@ -53,11 +53,7 @@ public:
 
   /// \brief Computes a path using A* algorithm
   /// \param nav_state Current navigation state (with odometry and goals)
-  void update(const NavState & nav_state) override;
-
-  /// \brief Returns the last computed path
-  /// \return nav_msgs::msg::Path with the poses from the last planning cycle
-  nav_msgs::msg::Path get_path() override;
+  void update(NavState & nav_state) override;
 
 protected:
   double robot_radius_;
