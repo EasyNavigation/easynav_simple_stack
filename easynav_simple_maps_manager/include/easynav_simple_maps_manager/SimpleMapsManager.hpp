@@ -89,14 +89,14 @@ public:
    *
    * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
    */
-  void set_static_map(std::shared_ptr<SimpleMap> new_map);
+  void set_static_map(const SimpleMap & new_map);
 
   /**
    * @brief Replaces the current dynamic map.
    *
    * @param new_map Shared pointer to a new map object. Must be of type SimpleMap.
    */
-  void set_dynamic_map(std::shared_ptr<SimpleMap> new_map);
+  void set_dynamic_map(const SimpleMap & new_map);
 
 protected:
   /**
@@ -108,12 +108,12 @@ private:
   /**
    * @brief Internal static map.
    */
-  std::shared_ptr<SimpleMap> static_map_;
+  SimpleMap static_map_;
 
   /**
    * @brief Internal dynamic map.
    */
-  std::shared_ptr<SimpleMap> dynamic_map_;
+  SimpleMap dynamic_map_;
 
   /**
    * @brief Publisher for the static occupancy grid.

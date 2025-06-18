@@ -75,8 +75,6 @@ double compute_path_length(const nav_msgs::msg::Path & path)
 
 SimplePlanner::SimplePlanner()
 {
-  current_path_ = std::make_shared<nav_msgs::msg::Path>();
-
   NavState::register_printer<nav_msgs::msg::Path>(
     [](const nav_msgs::msg::Path & path) {
       std::ostringstream ret;
@@ -107,7 +105,7 @@ SimplePlanner::on_initialize()
 void
 SimplePlanner::update(NavState & nav_state)
 {
-  current_path_->poses.clear();
+  current_path_.poses.clear();
 
   if (!nav_state.has("goals")) {return;}
   if (!nav_state.has("robot_pose")) {return;}
@@ -115,7 +113,7 @@ SimplePlanner::update(NavState & nav_state)
   const auto goals = nav_state.get<nav_msgs::msg::Goals>("goals");
 
   if (goals.goals.empty()) {
-    nav_state.set_shared_ptr("path", current_path_);
+    nav_state.set("path", current_path_);
     return;
   }
 
@@ -124,9 +122,9 @@ SimplePlanner::update(NavState & nav_state)
     return;
   }
 
-  std::shared_ptr<SimpleMap> map_typed;
+  SimpleMap map_typed;
   if (nav_state.has("map.dynamic")) {
-    map_typed = nav_state.get_ptr<SimpleMap>("map.dynamic");
+    map_typed = nav_state.get<SimpleMap>("map.dynamic");
   } else {
     RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.dynamic map");
     return;
@@ -135,7 +133,7 @@ SimplePlanner::update(NavState & nav_state)
   const auto robot_pose = nav_state.get<nav_msgs::msg::Odometry>("robot_pose");
   const auto & goal = goals.goals.front().pose;
 
-  auto downsampled_map = map_typed->downsample(0.2);
+  auto downsampled_map = map_typed.downsample(0.2);
 
   if (goals.header.frame_id != "map") {
     RCLCPP_WARN(get_node()->get_logger(),
@@ -156,23 +154,23 @@ SimplePlanner::update(NavState & nav_state)
     downsampled_map->resolution());
 
   if (!poses.empty()) {
-    current_path_->header.stamp = get_node()->now();
-    current_path_->header.frame_id = goals.header.frame_id;
+    current_path_.header.stamp = get_node()->now();
+    current_path_.header.frame_id = goals.header.frame_id;
 
     for (const auto & pose : poses) {
       geometry_msgs::msg::PoseStamped pose_stamped;
       pose_stamped.header.frame_id = goals.header.frame_id;
       pose_stamped.header.stamp = get_node()->now();
       pose_stamped.pose = pose;
-      current_path_->poses.push_back(pose_stamped);
+      current_path_.poses.push_back(pose_stamped);
     }
 
     if (path_pub_->get_subscription_count() > 0) {
-      path_pub_->publish(*current_path_);
+      path_pub_->publish(current_path_);
     }
   }
 
-  nav_state.set_shared_ptr("path", current_path_);
+  nav_state.set("path", current_path_);
 }
 
 

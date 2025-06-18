@@ -55,9 +55,6 @@ SimpleMapsManager::~SimpleMapsManager()
 std::expected<void, std::string>
 SimpleMapsManager::on_initialize()
 {
-  static_map_ = std::make_shared<SimpleMap>();
-  dynamic_map_ = std::make_shared<SimpleMap>();
-
   auto node = get_node();
   const auto & plugin_name = get_plugin_name();
 
@@ -77,7 +74,7 @@ SimpleMapsManager::on_initialize()
       return std::unexpected("Package " + package_name + " not found. Error: " + ex.what());
     }
 
-    if (!static_map_->load_from_file(map_path_)) {
+    if (!static_map_.load_from_file(map_path_)) {
       return std::unexpected("File [" + map_path_ + "] not found");
     }
   }
@@ -93,10 +90,10 @@ SimpleMapsManager::on_initialize()
     node->get_name() + std::string("/") + plugin_name + "/incoming_map",
     rclcpp::QoS(1).transient_local().reliable(),
     [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
-      static_map_->from_occupancy_grid(*msg);
-      dynamic_map_->from_occupancy_grid(*msg);
+      static_map_.from_occupancy_grid(*msg);
+      dynamic_map_.from_occupancy_grid(*msg);
 
-      static_map_->to_occupancy_grid(static_grid_msg_);
+      static_map_.to_occupancy_grid(static_grid_msg_);
       static_grid_msg_.header.frame_id = "map";
       static_grid_msg_.header.stamp = this->get_node()->now();
 
@@ -110,7 +107,7 @@ SimpleMapsManager::on_initialize()
       std::shared_ptr<std_srvs::srv::Trigger::Response> response)
     {
       (void)request;
-      if (!static_map_->save_to_file(map_path_)) {
+      if (!static_map_.save_to_file(map_path_)) {
         response->success = false;
         response->message = "Failed to save map to: " + map_path_;
       } else {
@@ -119,7 +116,7 @@ SimpleMapsManager::on_initialize()
       }
     });
 
-  static_map_->to_occupancy_grid(static_grid_msg_);
+  static_map_.to_occupancy_grid(static_grid_msg_);
   static_grid_msg_.header.frame_id = "map";
   static_grid_msg_.header.stamp = node->now();
 
@@ -135,13 +132,13 @@ SimpleMapsManager::on_initialize()
 }
 
 void
-SimpleMapsManager::set_static_map(std::shared_ptr<SimpleMap> new_map)
+SimpleMapsManager::set_static_map(const SimpleMap & new_map)
 {
   static_map_ = new_map;
 }
 
 void
-SimpleMapsManager::set_dynamic_map(std::shared_ptr<SimpleMap> new_map)
+SimpleMapsManager::set_dynamic_map(const SimpleMap & new_map)
 {
   dynamic_map_ = new_map;
 }
@@ -151,33 +148,33 @@ SimpleMapsManager::update(NavState & nav_state)
 {
   EASYNAV_TRACE_EVENT;
 
-  dynamic_map_->deep_copy(*static_map_);
+  dynamic_map_.deep_copy(static_map_);
 
   if (!nav_state.has("points")) {
-    nav_state.set_shared_ptr("map.static", static_map_);
-    nav_state.set_shared_ptr("map.dynamic", dynamic_map_);
+    nav_state.set("map.static", static_map_);
+    nav_state.set("map.dynamic", dynamic_map_);
     return;
   }
 
-  const auto perceptions = nav_state.get_ptr<PointPerceptions>("points");
+  const auto & perceptions = nav_state.get<PointPerceptions>("points");
 
-  auto fused = PointPerceptionsOpsView(*perceptions)
-    .downsample(dynamic_map_->resolution())
+  auto fused = PointPerceptionsOpsView(perceptions)
+    .downsample(dynamic_map_.resolution())
     .fuse("map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .as_points();
 
   for (const auto & p : fused) {
-    if (dynamic_map_->check_bounds_metric(p.x, p.y)) {
-      auto [cx, cy] = dynamic_map_->metric_to_cell(p.x, p.y);
-      dynamic_map_->at(cx, cy) = 1;
+    if (dynamic_map_.check_bounds_metric(p.x, p.y)) {
+      auto [cx, cy] = dynamic_map_.metric_to_cell(p.x, p.y);
+      dynamic_map_.at(cx, cy) = 1;
     }
   }
 
-  nav_state.set_shared_ptr("map.static", static_map_);
-  nav_state.set_shared_ptr("map.dynamic", dynamic_map_);
+  nav_state.set("map.static", static_map_);
+  nav_state.set("map.dynamic", dynamic_map_);
 
-  dynamic_map_->to_occupancy_grid(dynamic_grid_msg_);
+  dynamic_map_.to_occupancy_grid(dynamic_grid_msg_);
   dynamic_grid_msg_.header.frame_id = "map";
   dynamic_grid_msg_.header.stamp = get_node()->now();
   dynamic_occ_pub_->publish(dynamic_grid_msg_);

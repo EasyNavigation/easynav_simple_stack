@@ -102,7 +102,7 @@ protected:
 
   std::vector<Particle> particles_;
   std::default_random_engine rng_;
-  std::shared_ptr<nav_msgs::msg::Odometry> pose_;
+  nav_msgs::msg::Odometry pose_;
 
   double noise_translation_ {0.01};
   double noise_rotation_ {0.01};

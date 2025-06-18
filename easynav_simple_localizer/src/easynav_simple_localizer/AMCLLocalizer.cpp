@@ -162,8 +162,6 @@ using namespace std::chrono_literals;
 
 AMCLLocalizer::AMCLLocalizer()
 {
-  pose_ = std::make_shared<nav_msgs::msg::Odometry>();
-
   NavState::register_printer<nav_msgs::msg::Odometry>(
     [](const nav_msgs::msg::Odometry & odom) {
       std::ostringstream ret;
@@ -292,8 +290,7 @@ AMCLLocalizer::update_rt(NavState & nav_state)
 {
   predict(nav_state);
 
-  *pose_ = get_pose();
-  nav_state.set_shared_ptr("robot_pose", pose_);
+  nav_state.set("robot_pose", get_pose());
 }
 
 void
@@ -306,8 +303,7 @@ AMCLLocalizer::update(NavState & nav_state)
     last_reseed_ = get_node()->now();
   }
 
-  *pose_ = get_pose();
-  nav_state.set_shared_ptr("robot_pose", pose_);
+  nav_state.set("robot_pose", get_pose());
 
   publishParticles();
 }
@@ -382,22 +378,21 @@ void AMCLLocalizer::correct(NavState & nav_state)
     return;
   }
 
-  const auto perceptions = nav_state.get_ptr<PointPerceptions>("points");
+  const auto perceptions = nav_state.get<PointPerceptions>("points");
 
-  std::shared_ptr<SimpleMap> map_typed;
-  if (nav_state.has("map.static")) {
-    map_typed = nav_state.get_ptr<SimpleMap>("map.static");
-  } else {
+  if (!nav_state.has("map.static")) {
     RCLCPP_WARN(get_node()->get_logger(), "There is yet no a map.static map");
     return;
   }
 
-  const auto & filtered = PointPerceptionsOpsView(*perceptions)
-    .downsample(map_typed->resolution())
+  const auto & map_static = nav_state.get<SimpleMap>("map.static");
+
+  const auto & filtered = PointPerceptionsOpsView(perceptions)
+    .downsample(map_static.resolution())
     .fuse("base_footprint")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .collapse({NAN, NAN, 0.1})
-    ->downsample(map_typed->resolution())
+    ->downsample(map_static.resolution())
     .as_points();
 
   if (filtered.empty()) {
@@ -412,12 +407,12 @@ void AMCLLocalizer::correct(NavState & nav_state)
     for (const auto & pt : filtered) {
       tf2::Vector3 pt_world = particle.pose * tf2::Vector3(pt.x, pt.y, pt.z);
 
-      if (!map_typed->check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
+      if (!map_static.check_bounds_metric(pt_world.x(), pt_world.y())) {continue;}
 
       try {
-        auto [cell_x, cell_y] = map_typed->metric_to_cell(pt_world.x(), pt_world.y());
+        auto [cell_x, cell_y] = map_static.metric_to_cell(pt_world.x(), pt_world.y());
         ++possible_hits;
-        if (map_typed->at(cell_x, cell_y)) {
+        if (map_static.at(cell_x, cell_y)) {
           ++hits;
         }
       } catch (const std::out_of_range & e) {
