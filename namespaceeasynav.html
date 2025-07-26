@@ -85,17 +85,247 @@ $(function(){ initResizable(false); });
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">easynav Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1SimpleMapsManager.html">SimpleMapsManager</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A plugin-based map manager using the SimpleMap data structure.  <a href="classeasynav_1_1SimpleMapsManager.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1AMCLLocalizer.html">AMCLLocalizer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A localization method implementing a simplified AMCL (Adaptive Monte Carlo Localization) approach.  <a href="classeasynav_1_1AMCLLocalizer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structeasynav_1_1GridNode.html">GridNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structeasynav_1_1Particle.html">Particle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure representing a single particle in the AMCL algorithm.  <a href="structeasynav_1_1Particle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1PIDController.html">PIDController</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple PID (Proportional-Integral-Derivative) controller implementation.  <a href="classeasynav_1_1PIDController.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1SimpleController.html">SimpleController</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple path-following controller using PID and look-ahead strategy.  <a href="classeasynav_1_1SimpleController.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1SimpleMap.html">SimpleMap</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple 2D uint8_t grid using basic C++ types, with full metric conversion support.  <a href="classeasynav_1_1SimpleMap.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1SimpleMapsManager.html">SimpleMapsManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A plugin-based map manager using the <a class="el" href="classeasynav_1_1SimpleMap.html" title="Simple 2D uint8_t grid using basic C++ types, with full metric conversion support.">SimpleMap</a> data structure.  <a href="classeasynav_1_1SimpleMapsManager.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classeasynav_1_1SimplePlanner.html">SimplePlanner</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A planner implementing the A* algorithm on a <a class="el" href="classeasynav_1_1SimpleMap.html" title="Simple 2D uint8_t grid using basic C++ types, with full metric conversion support.">SimpleMap</a> grid.  <a href="classeasynav_1_1SimplePlanner.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a931faa1e8fa59bcd55bd44608036fde7" id="r_a931faa1e8fa59bcd55bd44608036fde7"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a931faa1e8fa59bcd55bd44608036fde7">compute_path_length</a> (const nav_msgs::msg::Path &amp;path)</td></tr>
+<tr class="separator:a931faa1e8fa59bcd55bd44608036fde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55e27e1302b601648f15e848000dd463" id="r_a55e27e1302b601648f15e848000dd463"><td class="memItemLeft" align="right" valign="top">tf2::Matrix3x3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55e27e1302b601648f15e848000dd463">computeCovariance</a> (const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;particles, std::size_t start, std::size_t count, const tf2::Vector3 &amp;mean)</td></tr>
+<tr class="separator:a55e27e1302b601648f15e848000dd463"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5961f8f07294b7a50de31475006578b8" id="r_a5961f8f07294b7a50de31475006578b8"><td class="memItemLeft" align="right" valign="top">tf2::Vector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5961f8f07294b7a50de31475006578b8">computeMean</a> (const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;particles, std::size_t start, std::size_t count)</td></tr>
+<tr class="separator:a5961f8f07294b7a50de31475006578b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f8929897ece27de5b38f687a5c9df5f" id="r_a1f8929897ece27de5b38f687a5c9df5f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f8929897ece27de5b38f687a5c9df5f">computeYawVariance</a> (const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;particles, std::size_t start, std::size_t count)</td></tr>
+<tr class="separator:a1f8929897ece27de5b38f687a5c9df5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a451c2322e6a5d1b0e8831d963907bca0" id="r_a451c2322e6a5d1b0e8831d963907bca0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a451c2322e6a5d1b0e8831d963907bca0">extractYaw</a> (const tf2::Transform &amp;transform)</td></tr>
+<tr class="separator:a451c2322e6a5d1b0e8831d963907bca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97ab651105ac66b0579d952b22cf4b85" id="r_a97ab651105ac66b0579d952b22cf4b85"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97ab651105ac66b0579d952b22cf4b85">heuristic</a> (int x1, int y1, int x2, int y2)</td></tr>
+<tr class="separator:a97ab651105ac66b0579d952b22cf4b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afac22b36fad17acea17ac83c1394b644" id="r_afac22b36fad17acea17ac83c1394b644"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afac22b36fad17acea17ac83c1394b644">printTransform</a> (const tf2::Transform &amp;tf)</td></tr>
+<tr class="separator:afac22b36fad17acea17ac83c1394b644"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a76a5c020adc2734cd8576af22f02db52" id="r_a76a5c020adc2734cd8576af22f02db52"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; int, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76a5c020adc2734cd8576af22f02db52">neighbors8</a></td></tr>
+<tr class="separator:a76a5c020adc2734cd8576af22f02db52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a931faa1e8fa59bcd55bd44608036fde7" name="a931faa1e8fa59bcd55bd44608036fde7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a931faa1e8fa59bcd55bd44608036fde7">&#9670;&#160;</a></span>compute_path_length()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double compute_path_length </td>
+          <td>(</td>
+          <td class="paramtype">const nav_msgs::msg::Path &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a55e27e1302b601648f15e848000dd463" name="a55e27e1302b601648f15e848000dd463"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55e27e1302b601648f15e848000dd463">&#9670;&#160;</a></span>computeCovariance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tf2::Matrix3x3 computeCovariance </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>particles</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const tf2::Vector3 &amp;</td>          <td class="paramname"><span class="paramname"><em>mean</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5961f8f07294b7a50de31475006578b8" name="a5961f8f07294b7a50de31475006578b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5961f8f07294b7a50de31475006578b8">&#9670;&#160;</a></span>computeMean()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tf2::Vector3 computeMean </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>particles</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1f8929897ece27de5b38f687a5c9df5f" name="a1f8929897ece27de5b38f687a5c9df5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f8929897ece27de5b38f687a5c9df5f">&#9670;&#160;</a></span>computeYawVariance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double computeYawVariance </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structeasynav_1_1Particle.html">Particle</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>particles</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>start</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a451c2322e6a5d1b0e8831d963907bca0" name="a451c2322e6a5d1b0e8831d963907bca0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a451c2322e6a5d1b0e8831d963907bca0">&#9670;&#160;</a></span>extractYaw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double extractYaw </td>
+          <td>(</td>
+          <td class="paramtype">const tf2::Transform &amp;</td>          <td class="paramname"><span class="paramname"><em>transform</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a97ab651105ac66b0579d952b22cf4b85" name="a97ab651105ac66b0579d952b22cf4b85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97ab651105ac66b0579d952b22cf4b85">&#9670;&#160;</a></span>heuristic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double heuristic </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>x1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>y1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>x2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>y2</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afac22b36fad17acea17ac83c1394b644" name="afac22b36fad17acea17ac83c1394b644"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afac22b36fad17acea17ac83c1394b644">&#9670;&#160;</a></span>printTransform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void printTransform </td>
+          <td>(</td>
+          <td class="paramtype">const tf2::Transform &amp;</td>          <td class="paramname"><span class="paramname"><em>tf</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a76a5c020adc2734cd8576af22f02db52" name="a76a5c020adc2734cd8576af22f02db52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76a5c020adc2734cd8576af22f02db52">&#9670;&#160;</a></span>neighbors8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::pair&lt;int, int&gt; &gt; neighbors8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">  {-1, -1}, {-1, 0}, {-1, 1},</div>
+<div class="line">  {0, -1}, {0, 1},</div>
+<div class="line">  {1, -1}, {1, 0}, {1, 1}</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

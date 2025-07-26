@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['features_0',['Features',['../index.html#autotoc_md3',1,'']]],
-  ['file_20format_1',['File Format',['../index.html#autotoc_md11',1,'']]],
-  ['for_20easy_20navigation_2',['SimpleMapsManager Plugin for Easy Navigation',['../index.html#autotoc_md1',1,'']]],
-  ['force_5fpath_3',['force_path',['../classFriendSimpleMapsManager.html#aa88c207d8b68a2ffba1a870becf9f487',1,'FriendSimpleMapsManager']]],
-  ['format_4',['File Format',['../index.html#autotoc_md11',1,'']]],
-  ['friendsimplemapsmanager_5',['FriendSimpleMapsManager',['../classFriendSimpleMapsManager.html',1,'']]]
+  ['deep_5fcopy_0',['deep_copy',['../classeasynav_1_1SimpleMap.html#ac3bf67184083f4b9a7b921a5789b3d1c',1,'easynav::SimpleMap']]],
+  ['downsample_1',['downsample',['../classeasynav_1_1SimpleMap.html#a8003818b926704676807e09627104419',1,'easynav::SimpleMap']]],
+  ['downsample_5ffactor_2',['downsample_factor',['../classeasynav_1_1SimpleMap.html#a1a0cf16c76126608b5e664df7b5cb3bd',1,'easynav::SimpleMap']]]
 ];

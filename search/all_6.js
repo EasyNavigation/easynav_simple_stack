@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['of_20save_20service_0',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['on_5finitialize_1',['on_initialize',['../classeasynav_1_1SimpleMapsManager.html#aa09f4316ce265b452c96e6d74101cd76',1,'easynav::SimpleMapsManager']]]
+  ['height_0',['height',['../classeasynav_1_1SimpleMap.html#adc662cea5b05cd9852d5a4538586d662',1,'easynav::SimpleMap']]],
+  ['heuristic_1',['heuristic',['../namespaceeasynav.html#a97ab651105ac66b0579d952b22cf4b85',1,'easynav']]],
+  ['hits_2',['hits',['../structeasynav_1_1Particle.html#a6eb4f6f645392a720b883b687918880f',1,'easynav::Particle']]]
 ];

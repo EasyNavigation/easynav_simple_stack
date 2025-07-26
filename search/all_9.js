@@ -1,15 +1,13 @@
 var searchData=
 [
-  ['save_20service_0',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['service_1',['Example Usage of Save Service',['../index.html#autotoc_md15',1,'']]],
-  ['services_2',['Services',['../index.html#autotoc_md9',1,'']]],
-  ['set_5fdynamic_5fmap_3',['set_dynamic_map',['../classeasynav_1_1SimpleMapsManager.html#a01e68f897b6aadab7399097c94dc56df',1,'easynav::SimpleMapsManager']]],
-  ['set_5fstatic_5fmap_4',['set_static_map',['../classeasynav_1_1SimpleMapsManager.html#a76ff9d2e4e77cedde9f42a6789ce6458',1,'easynav::SimpleMapsManager']]],
-  ['setup_5',['SetUp',['../classSimpleMapsManagerTest.html#a3a1707f6479611fdc609a3eb8a0cef1b',1,'SimpleMapsManagerTest']]],
-  ['simple_5fmapsmanager_5ftests_2ecpp_6',['simple_mapsmanager_tests.cpp',['../simple__mapsmanager__tests_8cpp.html',1,'']]],
-  ['simplemapsmanager_7',['SimpleMapsManager',['../classeasynav_1_1SimpleMapsManager.html',1,'SimpleMapsManager'],['../classeasynav_1_1SimpleMapsManager.html#a8937d22af1dbf51273c0cc1446783e00',1,'easynav::SimpleMapsManager::SimpleMapsManager()']]],
-  ['simplemapsmanager_20plugin_20for_20easy_20navigation_8',['SimpleMapsManager Plugin for Easy Navigation',['../index.html#autotoc_md1',1,'']]],
-  ['simplemapsmanager_2ecpp_9',['SimpleMapsManager.cpp',['../SimpleMapsManager_8cpp.html',1,'']]],
-  ['simplemapsmanager_2ehpp_10',['SimpleMapsManager.hpp',['../SimpleMapsManager_8hpp.html',1,'']]],
-  ['simplemapsmanagertest_11',['SimpleMapsManagerTest',['../classSimpleMapsManagerTest.html',1,'']]]
+  ['last_5fodom_5f_0',['last_odom_',['../classeasynav_1_1AMCLLocalizer.html#a9fed33e11517278eab40fa7fd968e3c6',1,'easynav::AMCLLocalizer']]],
+  ['last_5freseed_5f_1',['last_reseed_',['../classeasynav_1_1AMCLLocalizer.html#a5af295a79a8e77c50258e092c65e2a42',1,'easynav::AMCLLocalizer']]],
+  ['last_5fupdate_5fts_5f_2',['last_update_ts_',['../classeasynav_1_1SimpleController.html#aaf737907b981e04b56848b71d0305322',1,'easynav::SimpleController']]],
+  ['last_5fvlin_5f_3',['last_vlin_',['../classeasynav_1_1SimpleController.html#a26252a3c3888906b7df31ad32e3d584f',1,'easynav::SimpleController']]],
+  ['last_5fvrot_5f_4',['last_vrot_',['../classeasynav_1_1SimpleController.html#a6449b46aa66318f3afd1904dafa3e8e2',1,'easynav::SimpleController']]],
+  ['license_5',['License',['../index.html#autotoc_md17',1,'']]],
+  ['linear_5fpid_5f_6',['linear_pid_',['../classeasynav_1_1SimpleController.html#a4fd0eb0d7ce323984e5ff8782300d335',1,'easynav::SimpleController']]],
+  ['load_5ffrom_5ffile_7',['load_from_file',['../classeasynav_1_1SimpleMap.html#abaa81e954e88c713e94a4b317427fb50',1,'easynav::SimpleMap']]],
+  ['localizermethodbase_8',['LocalizerMethodBase',['../classLocalizerMethodBase.html',1,'']]],
+  ['look_5fahead_5fdist_5f_9',['look_ahead_dist_',['../classeasynav_1_1SimpleController.html#aafe39db8fdd7f0300e7696422f6247f1',1,'easynav::SimpleController']]]
 ];

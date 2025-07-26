@@ -1,0 +1,23 @@
+<map id="AMCLLocalizer" name="AMCLLocalizer">
+<area shape="rect" id="Node000001" title="A localization method implementing a simplified AMCL (Adaptive Monte Carlo Localization) approach." alt="" coords="333,253,443,279"/>
+<area shape="rect" id="Node000002" href="$classLocalizerMethodBase.html" title=" " alt="" coords="21,5,167,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,10,216,12,249,19,282,31,310,49,332,72,350,99,373,157,385,213,389,253,383,253,380,213,368,159,345,101,328,75,307,54,279,36,248,24,215,18,183,15"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="10,55,178,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,68,254,78,283,88,310,104,328,120,343,139,366,180,380,221,387,252,382,253,375,222,361,183,339,142,324,124,307,108,281,93,253,83,193,73"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="54,133,134,159"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,146,228,159,270,171,310,188,331,202,351,219,379,251,375,255,347,223,328,206,307,193,268,176,226,164,149,152"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,183,183,208"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="198,206,254,216,309,230,360,250,358,255,308,235,253,222,197,211"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="16,232,172,258"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="188,249,332,260,332,265,187,254"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="55,281,133,307"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="148,290,224,286,308,279,332,275,333,280,309,284,224,292,148,296"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="64,427,124,452"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="139,443,178,445,222,443,267,433,307,413,338,383,360,345,374,308,381,279,387,280,379,309,364,347,342,386,310,418,268,438,223,448,178,450,139,449"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="54,485,134,511"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="150,506,188,509,230,508,271,499,307,479,329,458,346,433,360,405,369,375,380,320,384,279,389,280,386,321,374,377,365,407,351,435,333,462,310,484,272,504,230,513,188,515,150,512"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="71,535,117,560"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="132,554,172,559,219,560,266,551,287,543,307,530,333,503,353,470,367,434,376,397,385,328,385,279,390,279,390,329,382,398,372,436,358,472,337,506,310,534,290,547,267,557,219,565,172,565,132,559"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="69,584,119,610"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="135,604,175,611,221,612,267,603,288,595,307,582,323,560,338,526,361,436,375,344,383,279,388,280,381,345,366,438,343,528,328,563,310,586,290,599,268,608,221,617,174,616,134,610"/>
+</map>
