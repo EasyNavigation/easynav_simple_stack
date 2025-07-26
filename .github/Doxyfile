@@ -865,7 +865,11 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = README.md \
-                         easynav_simple_maps_manager
+                         easynav_simple_common \
+                         easynav_simple_maps_manager \
+                         easynav_simple_localizer \
+                         easynav_simple_planner \
+                         easynav_simple_controller
 
 
 # This tag can be used to specify the character encoding of the source files

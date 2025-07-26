@@ -35,52 +35,73 @@
 namespace easynav
 {
 
-/// \brief Planner based on A* algorithm using SimpleMap
+/// \brief A planner implementing the A* algorithm on a SimpleMap grid.
 class SimplePlanner : public PlannerMethodBase
 {
 public:
-  /// \brief Default constructor
+  /**
+   * @brief Default constructor.
+   *
+   * Initializes the internal variables and parameters of the planner.
+   */
   explicit SimplePlanner();
 
   /**
    * @brief Initializes the planner.
    *
-   * Creates necessary publishers/subscribers and initializes the map instances.
+   * Configures publishers, retrieves parameters, and prepares the planner
+   * for path generation using the available map data.
    *
-   * @return std::expected<void, std::string> Success or error string.
+   * @return std::expected<void, std::string> Success or an error message.
    */
   virtual std::expected<void, std::string> on_initialize() override;
 
-  /// \brief Computes a path using A* algorithm
-  /// \param nav_state Current navigation state (with odometry and goals)
+  /**
+   * @brief Updates the planner by computing a new path.
+   *
+   * Uses the current navigation state (including the robot's position and goal)
+   * to generate a path based on the A* algorithm.
+   *
+   * @param nav_state The current navigation state (contains odometry and goal information).
+   */
   void update(NavState & nav_state) override;
 
 protected:
-  double robot_radius_;
-  double clearance_distance_;
+  double robot_radius_;        ///< Radius of the robot used for collision checking.
+  double clearance_distance_;  ///< Minimum clearance distance from obstacles in meters.
 
-  nav_msgs::msg::Path current_path_;
+  nav_msgs::msg::Path current_path_;  ///< The last computed path.
 
+  /// Publisher for the computed navigation path.
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
 
-  /// \brief Internal A* implementation
-  /// \param map The binary occupancy map
-  /// \param start Pose in world coordinates
-  /// \param goal Pose in world coordinates
-  /// \param resolution Cell size in meters
-  /// \return List of poses representing the path
+  /**
+   * @brief Runs the A* algorithm to compute a path.
+   *
+   * @param map The occupancy map used for path planning.
+   * @param start The starting pose in world coordinates.
+   * @param goal The target pose in world coordinates.
+   * @param resolution The cell resolution of the map (in meters).
+   * @return A sequence of poses representing the planned path.
+   */
   std::vector<geometry_msgs::msg::Pose> a_star_path(
     const SimpleMap & map,
     const geometry_msgs::msg::Pose & start,
     const geometry_msgs::msg::Pose & goal,
     double resolution);
 
-  /// \brief Checks if a cell is free considering a clearance radius
-  /// \param map The map to query
-  /// \param cx Cell x-coordinate
-  /// \param cy Cell y-coordinate
-  /// \param clearance_cells Minimum clearance radius in cells
-  /// \return true if the area is free, false if any nearby cell is occupied
+  /**
+   * @brief Checks whether a map cell is free, considering a clearance area.
+   *
+   * This function verifies if a cell and its surrounding cells (within the
+   * specified clearance radius) are free of obstacles.
+   *
+   * @param map The occupancy map to query.
+   * @param cx The x-coordinate of the cell.
+   * @param cy The y-coordinate of the cell.
+   * @param clearance_cells The clearance radius expressed in number of cells.
+   * @return true if the cell and its clearance area are free, false otherwise.
+   */
   bool isFreeWithClearance(
     const SimpleMap & map,
     int cx, int cy,

@@ -79,6 +79,7 @@ SimpleController::update_rt(NavState & nav_state)
 
   if (!nav_state.has("path")) {return;}
   if (!nav_state.has("robot_pose")) {return;}
+  if (!nav_state.has("path")) {return;}
 
   const auto path = nav_state.get<nav_msgs::msg::Path>("path");
 

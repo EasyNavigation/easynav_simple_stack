@@ -122,12 +122,6 @@ SimpleMapsManager::on_initialize()
 
   static_occ_pub_->publish(static_grid_msg_);
 
-  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(node->get_clock());
-  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_, node,
-    true);
-
-  session_ = std::make_shared<yaets::TraceSession>("/tmp/SimpleMapsManager.log");
-
   return {};
 }
 

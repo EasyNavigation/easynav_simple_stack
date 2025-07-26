@@ -144,18 +144,6 @@ private:
    * @brief Cached occupancy grid message for the dynamic map.
    */
   nav_msgs::msg::OccupancyGrid dynamic_grid_msg_;
-
-  /**
-   * @brief Buffer storing transformations between frames.
-   */
-  std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
-
-  /**
-   * @brief Transform listener that populates the tf buffer.
-   */
-  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
-
-  std::shared_ptr<yaets::TraceSession> session_;
 };
 
 }  // namespace easynav
