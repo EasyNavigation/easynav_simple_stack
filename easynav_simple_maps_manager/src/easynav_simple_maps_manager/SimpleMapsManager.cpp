@@ -65,6 +65,7 @@ SimpleMapsManager::on_initialize()
   node->get_parameter(plugin_name + ".package", package_name);
   node->get_parameter(plugin_name + ".map_path_file", map_path_file);
 
+  map_path_ = "/tmp/default.map";
   if (package_name != "" && map_path_file != "") {
     std::string pkgpath;
     try {
