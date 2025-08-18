@@ -81,28 +81,28 @@ SimpleMapsManager::on_initialize()
   }
 
   static_occ_pub_ = node->create_publisher<nav_msgs::msg::OccupancyGrid>(
-    node->get_name() + std::string("/") + plugin_name + "/map",
+    node->get_fully_qualified_name() + std::string("/") + plugin_name + "/map",
     rclcpp::QoS(1).transient_local().reliable());
 
   dynamic_occ_pub_ = node->create_publisher<nav_msgs::msg::OccupancyGrid>(
-    node->get_name() + std::string("/") + plugin_name + "/dynamic_map", 100);
+    node->get_fully_qualified_name() + std::string("/") + plugin_name + "/dynamic_map", 100);
 
   incoming_map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-    node->get_name() + std::string("/") + plugin_name + "/incoming_map",
+    node->get_fully_qualified_name() + std::string("/") + plugin_name + "/incoming_map",
     rclcpp::QoS(1).transient_local().reliable(),
     [this](nav_msgs::msg::OccupancyGrid::UniquePtr msg) {
       static_map_.from_occupancy_grid(*msg);
       dynamic_map_.from_occupancy_grid(*msg);
 
       static_map_.to_occupancy_grid(static_grid_msg_);
-      static_grid_msg_.header.frame_id = "map";
+      static_grid_msg_.header.frame_id = get_tf_ns() + "map";
       static_grid_msg_.header.stamp = this->get_node()->now();
 
       static_occ_pub_->publish(static_grid_msg_);
     });
 
   savemap_srv_ = node->create_service<std_srvs::srv::Trigger>(
-    node->get_name() + std::string("/") + plugin_name + "/savemap",
+    node->get_fully_qualified_name() + std::string("/") + plugin_name + "/savemap",
     [this](
       const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
       std::shared_ptr<std_srvs::srv::Trigger::Response> response)
@@ -118,7 +118,7 @@ SimpleMapsManager::on_initialize()
     });
 
   static_map_.to_occupancy_grid(static_grid_msg_);
-  static_grid_msg_.header.frame_id = "map";
+  static_grid_msg_.header.frame_id = get_tf_ns() + "map";
   static_grid_msg_.header.stamp = node->now();
 
   static_occ_pub_->publish(static_grid_msg_);
@@ -155,7 +155,7 @@ SimpleMapsManager::update(NavState & nav_state)
 
   auto fused = PointPerceptionsOpsView(perceptions)
     .downsample(dynamic_map_.resolution())
-    .fuse("map")
+    .fuse(get_tf_ns() + "map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .as_points();
 
@@ -170,7 +170,7 @@ SimpleMapsManager::update(NavState & nav_state)
   nav_state.set("map.dynamic", dynamic_map_);
 
   dynamic_map_.to_occupancy_grid(dynamic_grid_msg_);
-  dynamic_grid_msg_.header.frame_id = "map";
+  dynamic_grid_msg_.header.frame_id = get_tf_ns() + "map";
   dynamic_grid_msg_.header.stamp = get_node()->now();
   dynamic_occ_pub_->publish(dynamic_grid_msg_);
 }
