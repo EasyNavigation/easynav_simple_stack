@@ -95,7 +95,7 @@ SimpleMapsManager::on_initialize()
       dynamic_map_.from_occupancy_grid(*msg);
 
       static_map_.to_occupancy_grid(static_grid_msg_);
-      static_grid_msg_.header.frame_id = get_tf_ns() + "map";
+      static_grid_msg_.header.frame_id = get_tf_prefix() + "map";
       static_grid_msg_.header.stamp = this->get_node()->now();
 
       static_occ_pub_->publish(static_grid_msg_);
@@ -118,7 +118,7 @@ SimpleMapsManager::on_initialize()
     });
 
   static_map_.to_occupancy_grid(static_grid_msg_);
-  static_grid_msg_.header.frame_id = get_tf_ns() + "map";
+  static_grid_msg_.header.frame_id = get_tf_prefix() + "map";
   static_grid_msg_.header.stamp = node->now();
 
   static_occ_pub_->publish(static_grid_msg_);
@@ -155,7 +155,7 @@ SimpleMapsManager::update(NavState & nav_state)
 
   auto fused = PointPerceptionsOpsView(perceptions)
     .downsample(dynamic_map_.resolution())
-    .fuse(get_tf_ns() + "map")
+    .fuse(get_tf_prefix() + "map")
     ->filter({NAN, NAN, 0.1}, {NAN, NAN, NAN})
     .as_points();
 
@@ -170,7 +170,7 @@ SimpleMapsManager::update(NavState & nav_state)
   nav_state.set("map.dynamic", dynamic_map_);
 
   dynamic_map_.to_occupancy_grid(dynamic_grid_msg_);
-  dynamic_grid_msg_.header.frame_id = get_tf_ns() + "map";
+  dynamic_grid_msg_.header.frame_id = get_tf_prefix() + "map";
   dynamic_grid_msg_.header.stamp = get_node()->now();
   dynamic_occ_pub_->publish(dynamic_grid_msg_);
 }
