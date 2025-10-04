@@ -1,0 +1,10 @@
+# VS Code stuff 
+/.vscode/**
+
+# Python stuff
+**/__pycache__/
+
+# Colcon mistakes
+build/
+install/
+log/
