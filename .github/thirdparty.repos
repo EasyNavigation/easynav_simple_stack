@@ -1,4 +1,8 @@
 repositories:
+  ThirdParty/yaets:
+    type: git
+    url: https://github.com/fmrico/yaets.git
+    version: rolling
   ThirdParty/EasyNavigation:
     type: git
     url: https://github.com/EasyNavigation/EasyNavigation.git
