@@ -1,5 +1,8 @@
 # easynav_simple_stack
 
+> [!WARNING]
+> The development of the plugins in this repo has been moved to [easynav_plugins](https://github.com/EasyNavigation/easynav_plugins).
+
 ## SimpleMapsManager Plugin for Easy Navigation
 
 The `SimpleMapsManager` plugin provides a lightweight, ROS 2-compatible map management component for the Easy Navigation (EasyNav) framework. It is based on a 2D boolean grid (`SimpleMap`) and is optimized for efficient updates and metric conversion. This plugin can handle both static and dynamic map layers, integrating sensor-based perception to update the dynamic map.
